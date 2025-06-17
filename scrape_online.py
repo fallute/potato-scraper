@@ -14,21 +14,6 @@ states = [
     "uttar-pradesh", "uttrakhand", "west-bengal"
 ]
 
-async def scrape_potato_prices(state):
-    url = f"https://www.commodityonline.com/mandiprices/potato/{state}"
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context()
-        page = await context.new_page()
-        try:
-            await page.goto(url, timeout=30000)
-            await page.wait_for_selector("div.mandi_highlight", timeout=15000)
-            content = await page.inner_html("div.mandi_highlight")
-        except:
-            content = None
-        await browser.close()
-        return content
-
 def parse_prices(html):
     if not html:
         return {
@@ -70,16 +55,33 @@ def parse_prices(html):
 
 async def scrape_all_states(progress_callback=None):
     all_prices = []
-    for state in states:
-        if progress_callback:
-            progress_callback(state)
-        print(f"🔄 Scraping Online site → {state}", flush=True)
-        html = await scrape_potato_prices(state)
-        prices = parse_prices(html)
-        prices["State"] = state
-        avg = prices['Current Price (₹/Quintal)']
-        min_ = prices['Minimum Price (₹/Quintal)']
-        max_ = prices['Maximum Price (₹/Quintal)']
-        print(f"   ↳ ₹{avg} / ₹{min_} / ₹{max_}", flush=True)
-        all_prices.append(prices)
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
+        page = await context.new_page()
+
+        for state in states:
+            if progress_callback:
+                progress_callback(state)
+            print(f"🔄 Scraping Online site → {state}", flush=True)
+            url = f"https://www.commodityonline.com/mandiprices/potato/{state}"
+            try:
+                await page.goto(url, timeout=10000)
+                await page.wait_for_selector("div.mandi_highlight", timeout=10000)
+                html = await page.inner_html("div.mandi_highlight")
+            except Exception as e:
+                print(f"⚠️ Failed: {state} — {e}", flush=True)
+                html = None
+
+            prices = parse_prices(html)
+            prices["State"] = state
+            avg = prices['Current Price (₹/Quintal)']
+            min_ = prices['Minimum Price (₹/Quintal)']
+            max_ = prices['Maximum Price (₹/Quintal)']
+            print(f"   ↳ ₹{avg} / ₹{min_} / ₹{max_}", flush=True)
+            all_prices.append(prices)
+
+        await browser.close()
+
     return all_prices
