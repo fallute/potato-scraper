@@ -73,7 +73,7 @@ async def scrape_all_states(progress_callback=None):
     for state in states:
         if progress_callback:
             progress_callback(state)
-        print(f"🔄 Scraping Online site → {state}")
+        print(f"🔄 Scraping Online site → {state}", flush=True)
         html = await scrape_potato_prices(state)
         prices = parse_prices(html)
         prices["State"] = state

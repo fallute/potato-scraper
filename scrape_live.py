@@ -54,7 +54,7 @@ async def scrape_all_states(progress_callback=None):
         for state in states:
             if progress_callback:
                 progress_callback(state)
-            print(f"🔄 Scraping Live site → {state}")
+            print(f"🔄 Scraping Live site → {state}", flush=True)
             result = await scrape_state_price(page, state)
             results.append(result)
         await browser.close()
