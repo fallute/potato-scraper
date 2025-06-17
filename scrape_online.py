@@ -77,5 +77,9 @@ async def scrape_all_states(progress_callback=None):
         html = await scrape_potato_prices(state)
         prices = parse_prices(html)
         prices["State"] = state
+        avg = prices['Current Price (₹/Quintal)']
+        min_ = prices['Minimum Price (₹/Quintal)']
+        max_ = prices['Maximum Price (₹/Quintal)']
+        print(f"   ↳ ₹{avg} / ₹{min_} / ₹{max_}", flush=True)
         all_prices.append(prices)
     return all_prices

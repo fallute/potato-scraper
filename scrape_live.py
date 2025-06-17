@@ -56,6 +56,10 @@ async def scrape_all_states(progress_callback=None):
                 progress_callback(state)
             print(f"🔄 Scraping Live site → {state}", flush=True)
             result = await scrape_state_price(page, state)
+            avg = result['Average Price (₹/Quintal)']
+            min_ = result['Minimum Price (₹/Quintal)']
+            max_ = result['Maximum Price (₹/Quintal)']
+            print(f"   ↳ ₹{avg} / ₹{min_} / ₹{max_}", flush=True)
             results.append(result)
         await browser.close()
     return results
