@@ -65,14 +65,15 @@ async def scrape_all_states(progress_callback=None):
             if progress_callback:
                 progress_callback(state)
             print(f"🔄 Scraping Online site → {state}", flush=True)
-            url = f"https://www.commodityonline.com/mandiprices/potato/{state}"
+
+            html = None
             try:
+                url = f"https://www.commodityonline.com/mandiprices/potato/{state}"
                 await page.goto(url, timeout=10000)
                 await page.wait_for_selector("div.mandi_highlight", timeout=10000)
                 html = await page.inner_html("div.mandi_highlight")
-            except Exception as e:
-                print(f"⚠️ Failed: {state} — {e}", flush=True)
-                html = None
+            except:
+                pass  # suppress error messages
 
             prices = parse_prices(html)
             prices["State"] = state
