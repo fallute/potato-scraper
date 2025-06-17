@@ -1,0 +1,4 @@
+playwright
+nest_asyncio
+beautifulsoup4
+pandas

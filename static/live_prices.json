@@ -1,0 +1,170 @@
+[
+  {
+    "State": "andhra-pradesh",
+    "Average Price (\u20b9/Quintal)": 2000.0,
+    "Minimum Price (\u20b9/Quintal)": 1500.0,
+    "Maximum Price (\u20b9/Quintal)": 2500.0
+  },
+  {
+    "State": "arunachal-pradesh",
+    "Average Price (\u20b9/Quintal)": null,
+    "Minimum Price (\u20b9/Quintal)": null,
+    "Maximum Price (\u20b9/Quintal)": null
+  },
+  {
+    "State": "assam",
+    "Average Price (\u20b9/Quintal)": 1150.0,
+    "Minimum Price (\u20b9/Quintal)": 1000.0,
+    "Maximum Price (\u20b9/Quintal)": 1150.0
+  },
+  {
+    "State": "bihar",
+    "Average Price (\u20b9/Quintal)": 1474.0,
+    "Minimum Price (\u20b9/Quintal)": 1361.0,
+    "Maximum Price (\u20b9/Quintal)": 1596.0
+  },
+  {
+    "State": "chattisgarh",
+    "Average Price (\u20b9/Quintal)": 1550.0,
+    "Minimum Price (\u20b9/Quintal)": 1500.0,
+    "Maximum Price (\u20b9/Quintal)": 1700.0
+  },
+  {
+    "State": "delhi",
+    "Average Price (\u20b9/Quintal)": null,
+    "Minimum Price (\u20b9/Quintal)": null,
+    "Maximum Price (\u20b9/Quintal)": null
+  },
+  {
+    "State": "gujarat",
+    "Average Price (\u20b9/Quintal)": 1416.47,
+    "Minimum Price (\u20b9/Quintal)": 1132.35,
+    "Maximum Price (\u20b9/Quintal)": 1653.24
+  },
+  {
+    "State": "haryana",
+    "Average Price (\u20b9/Quintal)": 1065.0,
+    "Minimum Price (\u20b9/Quintal)": 963.6,
+    "Maximum Price (\u20b9/Quintal)": 1260.28
+  },
+  {
+    "State": "himachal-pradesh",
+    "Average Price (\u20b9/Quintal)": 1622.73,
+    "Minimum Price (\u20b9/Quintal)": 1400.0,
+    "Maximum Price (\u20b9/Quintal)": 1863.64
+  },
+  {
+    "State": "jharkhand",
+    "Average Price (\u20b9/Quintal)": null,
+    "Minimum Price (\u20b9/Quintal)": null,
+    "Maximum Price (\u20b9/Quintal)": null
+  },
+  {
+    "State": "karnataka",
+    "Average Price (\u20b9/Quintal)": 2144.0,
+    "Minimum Price (\u20b9/Quintal)": 1894.0,
+    "Maximum Price (\u20b9/Quintal)": 2319.0
+  },
+  {
+    "State": "kerala",
+    "Average Price (\u20b9/Quintal)": 3481.82,
+    "Minimum Price (\u20b9/Quintal)": 3218.18,
+    "Maximum Price (\u20b9/Quintal)": 3751.52
+  },
+  {
+    "State": "madhya-pradesh",
+    "Average Price (\u20b9/Quintal)": 1222.5,
+    "Minimum Price (\u20b9/Quintal)": 1080.83,
+    "Maximum Price (\u20b9/Quintal)": 1443.33
+  },
+  {
+    "State": "maharashtra",
+    "Average Price (\u20b9/Quintal)": 1636.67,
+    "Minimum Price (\u20b9/Quintal)": 1363.33,
+    "Maximum Price (\u20b9/Quintal)": 1906.67
+  },
+  {
+    "State": "manipur",
+    "Average Price (\u20b9/Quintal)": 3000.0,
+    "Minimum Price (\u20b9/Quintal)": 2750.0,
+    "Maximum Price (\u20b9/Quintal)": 3250.0
+  },
+  {
+    "State": "meghalaya",
+    "Average Price (\u20b9/Quintal)": 2100.0,
+    "Minimum Price (\u20b9/Quintal)": 1500.0,
+    "Maximum Price (\u20b9/Quintal)": 2700.0
+  },
+  {
+    "State": "mizoram",
+    "Average Price (\u20b9/Quintal)": null,
+    "Minimum Price (\u20b9/Quintal)": null,
+    "Maximum Price (\u20b9/Quintal)": null
+  },
+  {
+    "State": "nagaland",
+    "Average Price (\u20b9/Quintal)": 4350.0,
+    "Minimum Price (\u20b9/Quintal)": 4250.0,
+    "Maximum Price (\u20b9/Quintal)": 4500.0
+  },
+  {
+    "State": "odisha",
+    "Average Price (\u20b9/Quintal)": 1885.71,
+    "Minimum Price (\u20b9/Quintal)": 1778.57,
+    "Maximum Price (\u20b9/Quintal)": 2021.43
+  },
+  {
+    "State": "punjab",
+    "Average Price (\u20b9/Quintal)": 913.78,
+    "Minimum Price (\u20b9/Quintal)": 790.81,
+    "Maximum Price (\u20b9/Quintal)": 1094.59
+  },
+  {
+    "State": "rajasthan",
+    "Average Price (\u20b9/Quintal)": 1250.0,
+    "Minimum Price (\u20b9/Quintal)": 1023.08,
+    "Maximum Price (\u20b9/Quintal)": 1430.77
+  },
+  {
+    "State": "sikkim",
+    "Average Price (\u20b9/Quintal)": null,
+    "Minimum Price (\u20b9/Quintal)": null,
+    "Maximum Price (\u20b9/Quintal)": null
+  },
+  {
+    "State": "tamil-nadu",
+    "Average Price (\u20b9/Quintal)": 3925.71,
+    "Minimum Price (\u20b9/Quintal)": 3308.57,
+    "Maximum Price (\u20b9/Quintal)": 3925.71
+  },
+  {
+    "State": "telangana",
+    "Average Price (\u20b9/Quintal)": 2341.67,
+    "Minimum Price (\u20b9/Quintal)": 2216.67,
+    "Maximum Price (\u20b9/Quintal)": 2500.0
+  },
+  {
+    "State": "tripura",
+    "Average Price (\u20b9/Quintal)": 1977.27,
+    "Minimum Price (\u20b9/Quintal)": 1813.64,
+    "Maximum Price (\u20b9/Quintal)": 2154.55
+  },
+  {
+    "State": "uttar-pradesh",
+    "Average Price (\u20b9/Quintal)": 1175.2,
+    "Minimum Price (\u20b9/Quintal)": 1101.34,
+    "Maximum Price (\u20b9/Quintal)": 1249.9
+  },
+  {
+    "State": "uttrakhand",
+    "Average Price (\u20b9/Quintal)": 922.22,
+    "Minimum Price (\u20b9/Quintal)": 711.11,
+    "Maximum Price (\u20b9/Quintal)": 1116.67
+  },
+  {
+    "State": "west-bengal",
+    "Average Price (\u20b9/Quintal)": 1351.49,
+    "Minimum Price (\u20b9/Quintal)": 1313.68,
+    "Maximum Price (\u20b9/Quintal)": 1386.23
+  }
+]
