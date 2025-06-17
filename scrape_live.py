@@ -1,9 +1,7 @@
-import time
-import nest_asyncio
 import asyncio
 from playwright.async_api import async_playwright
 import re
-import json
+import nest_asyncio
 
 nest_asyncio.apply()
 
@@ -56,6 +54,7 @@ async def scrape_all_states(progress_callback=None):
         for state in states:
             if progress_callback:
                 progress_callback(state)
+            print(f"🔄 Scraping Live site → {state}")
             result = await scrape_state_price(page, state)
             results.append(result)
         await browser.close()

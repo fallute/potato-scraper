@@ -2,7 +2,6 @@ import asyncio
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 import nest_asyncio
-import json
 
 nest_asyncio.apply()
 
@@ -19,11 +18,7 @@ async def scrape_potato_prices(state):
     url = f"https://www.commodityonline.com/mandiprices/potato/{state}"
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                       "AppleWebKit/537.36 (KHTML, like Gecko) "
-                       "Chrome/114.0.0.0 Safari/537.36"
-        )
+        context = await browser.new_context()
         page = await context.new_page()
         try:
             await page.goto(url, timeout=30000)
@@ -35,7 +30,6 @@ async def scrape_potato_prices(state):
         return content
 
 def parse_prices(html):
-    from bs4 import BeautifulSoup
     if not html:
         return {
             'Current Price (₹/Quintal)': None,
@@ -79,6 +73,7 @@ async def scrape_all_states(progress_callback=None):
     for state in states:
         if progress_callback:
             progress_callback(state)
+        print(f"🔄 Scraping Online site → {state}")
         html = await scrape_potato_prices(state)
         prices = parse_prices(html)
         prices["State"] = state
