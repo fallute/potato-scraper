@@ -22,10 +22,10 @@ def main():
     t1.join()
     t2.join()
 
-    os.makedirs("static", exist_ok=True)
-    with open("static/live_prices.json", "w") as f:
+    os.makedirs("docs", exist_ok=True)
+    with open("docs/live_prices.json", "w") as f:
         json.dump(results["live"], f, indent=2)
-    with open("static/online_prices.json", "w") as f:
+    with open("docs/online_prices.json", "w") as f:
         json.dump(results["online"], f, indent=2)
 
     print("✅ Scraping complete!")

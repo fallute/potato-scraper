@@ -1,0 +1,34 @@
+name: Run Potato Scraper Twice Daily
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"  # Every 12 hours
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+
+      - name: Run Scrapers
+        run: python scrape_all.py
+
+      - name: Commit and Push JSON
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add docs/*.json
+          git commit -m "🔄 Auto-update JSON files"
+          git push
