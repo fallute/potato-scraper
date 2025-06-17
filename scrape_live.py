@@ -34,16 +34,16 @@ async def scrape_state_price(page, state):
             prices[label] = price_value
         return {
             "State": state,
-            "Average Price (₹/Quintal)": prices.get("Average Market Price:"),
-            "Minimum Price (₹/Quintal)": prices.get("Minimum Market Price:"),
-            "Maximum Price (₹/Quintal)": prices.get("Maximum Market Price:")
+            "Current_Price": prices.get("Average Market Price:"),
+            "Minimum_Price": prices.get("Minimum Market Price:"),
+            "Maximum_Price": prices.get("Maximum Market Price:")
         }
     except:
         return {
             "State": state,
-            "Average Price (₹/Quintal)": None,
-            "Minimum Price (₹/Quintal)": None,
-            "Maximum Price (₹/Quintal)": None
+            "Current_Price": None,
+            "Minimum_Price": None,
+            "Maximum_Price": None
         }
 
 async def scrape_all_states(progress_callback=None):
@@ -56,10 +56,7 @@ async def scrape_all_states(progress_callback=None):
                 progress_callback(state)
             print(f"🔄 Scraping Live site → {state}", flush=True)
             result = await scrape_state_price(page, state)
-            avg = result['Average Price (₹/Quintal)']
-            min_ = result['Minimum Price (₹/Quintal)']
-            max_ = result['Maximum Price (₹/Quintal)']
-            print(f"   ↳ ₹{avg} / ₹{min_} / ₹{max_}", flush=True)
+            print(f"   ↳ ₹{result['Current_Price']} / ₹{result['Minimum_Price']} / ₹{result['Maximum_Price']}", flush=True)
             results.append(result)
         await browser.close()
     return results

@@ -17,16 +17,16 @@ states = [
 def parse_prices(html):
     if not html:
         return {
-            'Current Price (₹/Quintal)': None,
-            'Minimum Price (₹/Quintal)': None,
-            'Maximum Price (₹/Quintal)': None
+            'Current_Price': None,
+            'Minimum_Price': None,
+            'Maximum_Price': None
         }
 
     soup = BeautifulSoup(html, "html.parser")
     result = {
-        'Current Price (₹/Quintal)': None,
-        'Minimum Price (₹/Quintal)': None,
-        'Maximum Price (₹/Quintal)': None
+        'Current_Price': None,
+        'Minimum_Price': None,
+        'Maximum_Price': None
     }
 
     divs = soup.select('div.row > div.col-md-4')
@@ -45,11 +45,11 @@ def parse_prices(html):
                 price_value = None
 
             if "Average Price" in text_label:
-                result['Current Price (₹/Quintal)'] = price_value
+                result['Current_Price'] = price_value
             elif "Lowest Market Price" in text_label:
-                result['Minimum Price (₹/Quintal)'] = price_value
+                result['Minimum_Price'] = price_value
             elif "Costliest Market Price" in text_label:
-                result['Maximum Price (₹/Quintal)'] = price_value
+                result['Maximum_Price'] = price_value
 
     return result
 
@@ -77,9 +77,9 @@ async def scrape_all_states(progress_callback=None):
 
             prices = parse_prices(html)
             prices["State"] = state
-            avg = prices['Current Price (₹/Quintal)']
-            min_ = prices['Minimum Price (₹/Quintal)']
-            max_ = prices['Maximum Price (₹/Quintal)']
+            avg = prices['Current_Price']
+            min_ = prices['Minimum_Price']
+            max_ = prices['Maximum_Price']
             print(f"   ↳ ₹{avg} / ₹{min_} / ₹{max_}", flush=True)
             all_prices.append(prices)
 
