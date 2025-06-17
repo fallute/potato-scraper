@@ -2,12 +2,13 @@ name: Run Potato Scraper Twice Daily
 
 on:
   schedule:
-    - cron: "0 */12 * * *"
+    - cron: "0 */12 * * *"  # Every 12 hours
   workflow_dispatch:
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -30,5 +31,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add docs/*.json
-          git commit -m "🔄 Auto-update JSON files"
-          git push
+          git commit -m "🔄 Auto-update JSON files" || echo "No changes to commit"
+          git push || echo "Nothing to push"
