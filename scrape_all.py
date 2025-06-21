@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import threading
+from collections import defaultdict
 
 from scrape_live import scrape_all_states as scrape_live
 from scrape_online import scrape_all_states as scrape_online
@@ -22,13 +23,29 @@ def run_online():
     except Exception as e:
         print(f"❌ Error in online scraper: {e}", flush=True)
 
-def extract_values(data, key):
-    return [entry[key] for entry in data if entry.get(key) is not None]
-
 def calculate_average(values):
     if not values:
         return None
     return round(sum(values) / len(values), 2)
+
+def compute_per_state_averages(live_data, online_data):
+    merged = defaultdict(list)
+
+    for source in [live_data, online_data]:
+        for entry in source or []:
+            state = entry.get("State")
+            if state:
+                merged[state].append(entry)
+
+    output = []
+    for state, entries in merged.items():
+        avg_entry = {"State": state}
+        for key in ["Current_Price", "Minimum_Price", "Maximum_Price"]:
+            values = [e[key] for e in entries if e.get(key) is not None]
+            avg_entry[key] = calculate_average(values)
+        output.append(avg_entry)
+
+    return sorted(output, key=lambda x: x["State"])
 
 def main():
     print("🔁 Launching both scrapers (Live & Online)...", flush=True)
@@ -47,16 +64,11 @@ def main():
     with open("docs/online_prices.json", "w") as f:
         json.dump(results["online"], f, indent=2)
 
-    # ✅ New: Calculate and save combined averages
-    combined = (results["live"] or []) + (results["online"] or [])
-    averages = {}
-    for key in ["Current_Price", "Minimum_Price", "Maximum_Price"]:
-        values = extract_values(combined, key)
-        avg = calculate_average(values)
-        averages[key] = avg
+    # ✅ Per-state combined averages only
+    per_state_avg = compute_per_state_averages(results["live"], results["online"])
 
     with open("docs/combined_averages.json", "w") as f:
-        json.dump(averages, f, indent=2)
+        json.dump(per_state_avg, f, indent=2)
 
     print("✅ All done!", flush=True)
 
