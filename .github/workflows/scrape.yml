@@ -1,35 +1,38 @@
-name: Run Potato Scraper Twice Daily
+name: Scrape and Upload
 
 on:
   schedule:
-    - cron: "0 */12 * * *"  # Every 12 hours
-  workflow_dispatch:
+    - cron: '0 */12 * * *'  # every 12 hours
+  repository_dispatch:
+    types: [run-scraper]     # 🔁 Allow external manual trigger via API
 
 jobs:
-  scrape:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      # ✅ Your existing logic untouched
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
       - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
-          playwright install chromium
+        run: pip install -r requirements.txt
 
       - name: Run Scrapers
-        run: python scrape_all.py
-
-      - name: Commit and Push JSON
         run: |
-          git config user.name "github-actions"
+          python scrape_live.py
+          python scrape_online.py
+          python combine.py
+
+      - name: Commit and Push
+        run: |
+          git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add docs/*.json
-          git commit -m "🔄 Auto-update JSON files" || echo "No changes to commit"
-          git push || echo "Nothing to push"
+          git add live_prices.json online_prices.json combined_averages.json
+          git commit -m "🔁 Update JSON from scheduled scrape"
+          git push
