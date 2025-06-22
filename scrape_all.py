@@ -3,6 +3,7 @@ import json
 import os
 import threading
 from collections import defaultdict
+import datetime  # moved import here for cleanliness
 
 from scrape_live import scrape_all_states as scrape_live
 from scrape_online import scrape_all_states as scrape_online
@@ -64,11 +65,14 @@ def main():
     with open("docs/online_prices.json", "w") as f:
         json.dump(results["online"], f, indent=2)
 
-    # ✅ Per-state combined averages only
     per_state_avg = compute_per_state_averages(results["live"], results["online"])
-
     with open("docs/combined_averages.json", "w") as f:
         json.dump(per_state_avg, f, indent=2)
+
+    # === Added: Save scraper run timestamp JSON ===
+    timestamp_data = {"last_run": datetime.datetime.utcnow().isoformat() + "Z"}
+    with open("docs/run_timestamp.json", "w") as f:
+        json.dump(timestamp_data, f, indent=2)
 
     print("✅ All done!", flush=True)
 

@@ -1,4 +1,4 @@
-name: Scrape and Upload
+name: Run Scrapper and Upload
 
 on:
   schedule:
