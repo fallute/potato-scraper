@@ -48,9 +48,9 @@
     "State": "haryana"
   },
   {
-    "Current_Price": 1489.47,
-    "Minimum_Price": 1000.0,
-    "Maximum_Price": 2500.0,
+    "Current_Price": null,
+    "Minimum_Price": null,
+    "Maximum_Price": null,
     "State": "himachal-pradesh"
   },
   {
@@ -162,9 +162,9 @@
     "State": "uttrakhand"
   },
   {
-    "Current_Price": 1399.0,
-    "Minimum_Price": 1080.0,
-    "Maximum_Price": 2100.0,
+    "Current_Price": null,
+    "Minimum_Price": null,
+    "Maximum_Price": null,
     "State": "west-bengal"
   }
 ]
