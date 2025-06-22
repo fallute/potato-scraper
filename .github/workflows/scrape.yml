@@ -2,16 +2,15 @@ name: Scrape and Upload
 
 on:
   schedule:
-    - cron: '0 */12 * * *'  # every 12 hours
+    - cron: '0 */12 * * *'  # Every 12 hours
   repository_dispatch:
-    types: [run-scraper]     # 🔁 Allow external manual trigger via API
+    types: [run-scraper]     # Allow manual trigger via GitHub API
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Your existing logic untouched
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -23,16 +22,13 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Scrapers
-        run: |
-          python scrape_live.py
-          python scrape_online.py
-          python combine.py
+      - name: Run All Scrapers
+        run: python scrape_all.py
 
       - name: Commit and Push
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add live_prices.json online_prices.json combined_averages.json
-          git commit -m "🔁 Update JSON from scheduled scrape"
+          git add docs/*.json
+          git commit -m "🔁 Update scraped data"
           git push
