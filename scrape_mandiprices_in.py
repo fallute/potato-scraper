@@ -1,4 +1,4 @@
-import asyncio, json, re, random
+import asyncio, re, random
 from statistics import mean
 from collections import defaultdict
 from playwright.async_api import async_playwright
@@ -59,7 +59,15 @@ async def select_by_label(page, label_text, desired_option):
 
         print(f"Selecting '{desired_option}' from '{label_text}'")
         await target.click()
-        await wait_random(f"after opening dropdown '{label_text}'")
+
+        if label_text.lower() == "all commodities":
+            print("⏳ Waiting 11s before selecting 'Potato'")
+            await asyncio.sleep(11)
+        elif label_text.lower() == "paginated":
+            print("⏳ Waiting 11s before selecting 'Scroll'")
+            await asyncio.sleep(11)
+        else:
+            await wait_random(f"after opening dropdown '{label_text}'")
 
         await retry(
             lambda: page.locator('div[data-radix-popper-content-wrapper]').wait_for(timeout=5000),
@@ -70,6 +78,7 @@ async def select_by_label(page, label_text, desired_option):
             lambda: page.locator('div[role="option"][data-radix-collection-item]', has_text=desired_option).first.wait_for(timeout=8000),
             f"wait for option '{desired_option}' to appear"
         )
+
         option = page.locator('div[role="option"][data-radix-collection-item]', has_text=desired_option).first
         await retry(lambda: option.scroll_into_view_if_needed(), f"scroll '{desired_option}' into view")
         await retry(lambda: option.click(), f"click option '{desired_option}'")
@@ -159,8 +168,8 @@ async def scrape_mandiprices(return_results=False):
             "uttar-pradesh", "uttrakhand", "west-bengal"
         ]
 
-        normalized = {}
         mapping = {"nct-of-delhi": "delhi", "uttarakhand": "uttrakhand"}
+        normalized = {}
 
         for item in averaged_data:
             raw = item["State"].strip().lower().replace(" ", "-")
