@@ -26,14 +26,15 @@ async def retry(action, label="", attempts=2, wait=1000):
 
 async def select_by_label(page, label_text, desired_option):
     try:
-        await wait_random(f"preparing to select '{label_text}'")
-        buttons = page.locator('button[role="combobox"]')
+        await wait_random(f"{label_text} dropdown")
+
+        buttons = page.locator('xpath=//button[@role="combobox"]')
         count = await buttons.count()
         target = None
 
         for i in range(count):
             try:
-                span = buttons.nth(i).locator("span")
+                span = buttons.nth(i).locator("xpath=.//span")
                 text = await span.inner_text()
                 if label_text.lower() in text.lower():
                     current_text = await buttons.nth(i).text_content() or ""
@@ -61,25 +62,25 @@ async def select_by_label(page, label_text, desired_option):
         await target.click()
 
         if label_text.lower() == "all commodities":
-            print("⏳ Waiting 11s before selecting 'Potato'")
+            print("✅ 'All Commodities' dropdown opened, waiting 11s before selecting 'Potato'")
             await asyncio.sleep(11)
         elif label_text.lower() == "paginated":
-            print("⏳ Waiting 11s before selecting 'Scroll'")
+            print("✅ 'Paginated' dropdown opened, waiting 11s before selecting 'Scroll'")
             await asyncio.sleep(11)
         else:
-            await wait_random(f"after opening dropdown '{label_text}'")
+            await retry(
+                lambda: page.locator('xpath=//div[@data-radix-popper-content-wrapper]').wait_for(state="visible", timeout=10000),
+                f"wait for dropdown '{label_text}' content to appear"
+            )
+            delay = random.randint(5, 8)
+            print(f"✅ '{label_text}' visible, waiting extra {delay}s before selecting '{desired_option}'...")
+            await asyncio.sleep(delay)
 
         await retry(
-            lambda: page.locator('div[data-radix-popper-content-wrapper]').wait_for(timeout=5000),
-            "wait for radix dropdown to appear"
+            lambda: page.locator(f'xpath=//div[@role="option" and contains(.,"{desired_option}")]').first.wait_for(state="visible", timeout=8000),
+            f"wait for option '{desired_option}' to be visible"
         )
-
-        await retry(
-            lambda: page.locator('div[role="option"][data-radix-collection-item]', has_text=desired_option).first.wait_for(timeout=8000),
-            f"wait for option '{desired_option}' to appear"
-        )
-
-        option = page.locator('div[role="option"][data-radix-collection-item]', has_text=desired_option).first
+        option = page.locator(f'xpath=//div[@role="option" and contains(.,"{desired_option}")]').first
         await retry(lambda: option.scroll_into_view_if_needed(), f"scroll '{desired_option}' into view")
         await retry(lambda: option.click(), f"click option '{desired_option}'")
 
@@ -89,34 +90,39 @@ async def select_by_label(page, label_text, desired_option):
         if desired_option.lower() not in confirmed.lower():
             print(f"⚠️ Warning: Confirmed selection is '{confirmed}', expected '{desired_option}'")
 
+        # ⬇️ Re-check Potato if we just selected Scroll
+        if label_text.lower() == "paginated":
+            print("🔁 Re-checking 'All Commodities' → 'Potato' after Scroll selection")
+            await select_by_label(page, "All Commodities", "Potato")
+
     except Exception as e:
         print(f"Error: Dropdown failed [{label_text} → {desired_option}]: {e}")
 
 async def scrape_mandiprices(return_results=False):
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(headless=False)
         page = await browser.new_page()
 
         try:
             await retry(lambda: page.goto("https://www.mandiprices.in/", timeout=60000), "navigate to site")
-            await wait_random("page load")
+            await retry(lambda: page.locator('xpath=//button[@role="combobox"]').first.wait_for(state="visible", timeout=10000), "wait for page to stabilize")
+            await wait_random("after page load")
 
             await select_by_label(page, "All Commodities", "Potato")
             await select_by_label(page, "All States", "All States")
             await select_by_label(page, "Price in Kg", "Price in Quintal")
             await select_by_label(page, "Paginated", "Scroll")
 
-            await wait_random("before waiting for table rows")
-            await retry(lambda: page.wait_for_selector("table tbody tr", timeout=15000), "wait for table")
+            await retry(lambda: page.locator('xpath=//table//tbody//tr').first.wait_for(state="visible", timeout=10000), "wait for table to appear")
             await wait_random("after table appears")
 
-            rows = await page.query_selector_all("table tbody tr")
+            rows = await page.query_selector_all('xpath=//table//tbody//tr')
             print(f"Found {len(rows)} table rows")
 
             raw_data = []
             for idx, row in enumerate(rows):
                 try:
-                    cols = await row.query_selector_all("td")
+                    cols = await row.query_selector_all("xpath=.//td")
                     if len(cols) < 11:
                         continue
                     try:
