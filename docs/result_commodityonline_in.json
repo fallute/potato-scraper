@@ -108,9 +108,9 @@
     "State": "nagaland"
   },
   {
-    "Current_Price": null,
-    "Minimum_Price": null,
-    "Maximum_Price": null,
+    "Current_Price": 1900.0,
+    "Minimum_Price": 1000.0,
+    "Maximum_Price": 2500.0,
     "State": "odisha"
   },
   {
@@ -120,9 +120,9 @@
     "State": "punjab"
   },
   {
-    "Current_Price": null,
-    "Minimum_Price": null,
-    "Maximum_Price": null,
+    "Current_Price": 1172.73,
+    "Minimum_Price": 600.0,
+    "Maximum_Price": 1800.0,
     "State": "rajasthan"
   },
   {
