@@ -5,6 +5,7 @@ on:
     - cron: '0 */12 * * *'  # Every 12 hours
   repository_dispatch:
     types: [run-scraper]     # Allow manual trigger via GitHub API
+  workflow_dispatch:         # ✅ This enables the "Run workflow" button in GitHub UI
 
 jobs:
   build:
