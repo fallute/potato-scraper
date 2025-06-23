@@ -33,6 +33,11 @@ async def select_if_needed(page, label_text, desired_option):
         await retry(lambda: page.get_by_role("option", name=desired_option, exact=True).is_visible(), f"wait for option '{desired_option}'", wait=1000)
         await page.get_by_role("option", name=desired_option, exact=True).click()
         await page.wait_for_timeout(1500)
+
+        # 🧠 Confirm selection applied
+        confirmed = await button.inner_text()
+        if desired_option.lower() not in confirmed.lower():
+            raise Exception(f"Post-check failed: '{desired_option}' not selected in '{label_text}' → got '{confirmed}'")
     except Exception as e:
         print(f"Error: Dropdown failed [{label_text} → {desired_option}]: {e}")
         raise
