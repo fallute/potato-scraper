@@ -30,7 +30,7 @@ async def select_if_needed(page, label_text, desired_option):
             return
         print(f"Selecting '{desired_option}' from '{label_text}'")
         await button.click()
-        await retry(lambda: page.wait_for_selector(f'div[role="option"]:has-text("{desired_option}")', timeout=8000), f"option '{desired_option}'")
+        await retry(lambda: page.get_by_role("option", name=desired_option, exact=True).is_visible(), f"wait for option '{desired_option}'", wait=1000)
         await page.get_by_role("option", name=desired_option, exact=True).click()
         await page.wait_for_timeout(1500)
     except Exception as e:
