@@ -74,12 +74,18 @@ def main():
 
     print("💾 Saving JSON to /docs", flush=True)
     os.makedirs("docs", exist_ok=True)
-    with open("docs/result_commoditymarketlive_in.json", "w") as f:
-        json.dump(results["commoditymarketlive"], f, indent=2)
-    with open("docs/result_commodityonline_in.json", "w") as f:
-        json.dump(results["commodityonline"], f, indent=2)
-    with open("docs/result_mandiprices_in.json", "w") as f:
-        json.dump(results["mandiprices"], f, indent=2)
+
+    if results["commoditymarketlive"]:
+        with open("docs/result_commoditymarketlive_in.json", "w") as f:
+            json.dump(results["commoditymarketlive"], f, indent=2)
+
+    if results["commodityonline"]:
+        with open("docs/result_commodityonline_in.json", "w") as f:
+            json.dump(results["commodityonline"], f, indent=2)
+
+    if results["mandiprices"]:
+        with open("docs/result_mandiprices_in.json", "w") as f:
+            json.dump(results["mandiprices"], f, indent=2)
 
     per_state_avg = compute_per_state_averages(
         results["commoditymarketlive"],
@@ -92,6 +98,14 @@ def main():
     timestamp_data = {"last_run": datetime.datetime.utcnow().isoformat() + "Z"}
     with open("docs/run_timestamp.json", "w") as f:
         json.dump(timestamp_data, f, indent=2)
+
+    failed = {}
+    for key in ["commoditymarketlive", "commodityonline", "mandiprices"]:
+        if results[key] is None:
+            failed[f"{key}_scraper"] = "Failed"
+
+    with open("docs/status_report.json", "w") as f:
+        json.dump(failed if failed else None, f, indent=2)
 
     print("✅ All done!", flush=True)
 
