@@ -85,7 +85,7 @@ async def select_by_label(page, label_text, desired_option):
 
 async def scrape_mandiprices(return_results=False):
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=true)
+        browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
 
         try:
