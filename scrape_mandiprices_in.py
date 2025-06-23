@@ -174,11 +174,8 @@ async def scrape_mandiprices(return_results=False):
                 "Current_Price": 0
             }))
 
-        with open("result_mandiprices_in.json", "w") as f:
-            json.dump(final, f, indent=2)
-        print("✅ Saved data to result_mandiprices_in.json")
-
-        return final
+        print("✅ Scraping complete. Final results prepared.")
+        return final if return_results else None
 
 if __name__ == "__main__":
     asyncio.run(scrape_mandiprices())
