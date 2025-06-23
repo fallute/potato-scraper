@@ -3,36 +3,36 @@ import json
 import os
 import threading
 from collections import defaultdict
-import datetime  # moved import here for cleanliness
+import datetime
 
-from scrape_live import scrape_all_states as scrape_live
-from scrape_online import scrape_all_states as scrape_online
+from scrape_commoditymarketlive_com import scrape_all_states as scrape_all_states_commoditymarketlive
+from scrape_commodityonline_com import scrape_all_states as scrape_all_states_commodityonline
 
-results = {"live": None, "online": None}
+results = {"commoditymarketlive": None, "commodityonline": None}
 
-def run_live():
+def run_commoditymarketlive():
     try:
-        print("🚀 Starting Live scraper", flush=True)
-        results["live"] = asyncio.run(scrape_live())
+        print("🚀 Starting CommodityMarketLive scraper", flush=True)
+        results["commoditymarketlive"] = asyncio.run(scrape_all_states_commoditymarketlive())
     except Exception as e:
-        print(f"❌ Error in live scraper: {e}", flush=True)
+        print(f"❌ Error in CommodityMarketLive scraper: {e}", flush=True)
 
-def run_online():
+def run_commodityonline():
     try:
-        print("🚀 Starting Online scraper", flush=True)
-        results["online"] = asyncio.run(scrape_online())
+        print("🚀 Starting CommodityOnline scraper", flush=True)
+        results["commodityonline"] = asyncio.run(scrape_all_states_commodityonline())
     except Exception as e:
-        print(f"❌ Error in online scraper: {e}", flush=True)
+        print(f"❌ Error in CommodityOnline scraper: {e}", flush=True)
 
 def calculate_average(values):
     if not values:
         return None
     return round(sum(values) / len(values), 2)
 
-def compute_per_state_averages(live_data, online_data):
+def compute_per_state_averages(commoditymarketlive_data, commodityonline_data):
     merged = defaultdict(list)
 
-    for source in [live_data, online_data]:
+    for source in [commoditymarketlive_data, commodityonline_data]:
         for entry in source or []:
             state = entry.get("State")
             if state:
@@ -49,10 +49,10 @@ def compute_per_state_averages(live_data, online_data):
     return sorted(output, key=lambda x: x["State"])
 
 def main():
-    print("🔁 Launching both scrapers (Live & Online)...", flush=True)
+    print("🔁 Launching both scrapers (CommodityMarketLive & CommodityOnline)...", flush=True)
 
-    t1 = threading.Thread(target=run_live)
-    t2 = threading.Thread(target=run_online)
+    t1 = threading.Thread(target=run_commoditymarketlive)
+    t2 = threading.Thread(target=run_commodityonline)
     t1.start()
     t2.start()
     t1.join()
@@ -60,16 +60,15 @@ def main():
 
     print("💾 Saving JSON to /docs", flush=True)
     os.makedirs("docs", exist_ok=True)
-    with open("docs/live_prices.json", "w") as f:
-        json.dump(results["live"], f, indent=2)
-    with open("docs/online_prices.json", "w") as f:
-        json.dump(results["online"], f, indent=2)
+    with open("docs/result_commoditymarketlive_in.json", "w") as f:
+        json.dump(results["commoditymarketlive"], f, indent=2)
+    with open("docs/result_commodityonline_in.json", "w") as f:
+        json.dump(results["commodityonline"], f, indent=2)
 
-    per_state_avg = compute_per_state_averages(results["live"], results["online"])
+    per_state_avg = compute_per_state_averages(results["commoditymarketlive"], results["commodityonline"])
     with open("docs/combined_averages.json", "w") as f:
         json.dump(per_state_avg, f, indent=2)
 
-    # === Added: Save scraper run timestamp JSON ===
     timestamp_data = {"last_run": datetime.datetime.utcnow().isoformat() + "Z"}
     with open("docs/run_timestamp.json", "w") as f:
         json.dump(timestamp_data, f, indent=2)
