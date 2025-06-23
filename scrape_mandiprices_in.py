@@ -10,7 +10,7 @@ def parse_price(text):
     match = re.search(r"[\d,.]+", text)
     return float(match.group(0).replace(",", "")) if match else None
 
-async def retry(action, label="", attempts=3, wait=1000):
+async def retry(action, label="", attempts=2, wait=1000):
     for i in range(attempts):
         try:
             return await action()
@@ -19,42 +19,77 @@ async def retry(action, label="", attempts=3, wait=1000):
             await asyncio.sleep(wait / 1000)
     raise Exception(f"Failed after {attempts} attempts: {label}")
 
-async def select_if_needed(page, label_text, desired_option):
+async def select_by_label(page, label_text, desired_option):
     try:
         await page.wait_for_timeout(1000)
-        button = page.locator(f'button[role="combobox"]:has-text("{label_text}")')
-        await retry(lambda: button.wait_for(timeout=8000), f"wait for dropdown '{label_text}'")
-        current = await button.inner_text()
-        if desired_option.lower() in current.lower():
-            print(f"Already selected: '{desired_option}'")
-            return
-        print(f"Selecting '{desired_option}' from '{label_text}'")
-        await button.click()
-        await retry(lambda: page.get_by_role("option", name=desired_option, exact=True).is_visible(), f"wait for option '{desired_option}'", wait=1000)
-        await page.get_by_role("option", name=desired_option, exact=True).click()
-        await page.wait_for_timeout(1500)
+        buttons = page.locator('button[role="combobox"]')
+        count = await buttons.count()
+        target = None
 
-        # 🧠 Confirm selection applied
-        confirmed = await button.inner_text()
+        for i in range(count):
+            try:
+                span = buttons.nth(i).locator("span")
+                text = await span.inner_text()
+                if label_text.lower() in text.lower():
+                    current_text = await buttons.nth(i).text_content() or ""
+                    if desired_option.lower() in current_text.lower():
+                        print(f"Already selected: '{desired_option}'")
+                        return
+                    target = buttons.nth(i)
+                    break
+            except:
+                continue
+
+        if target is None:
+            for i in range(count):
+                try:
+                    current_text = await buttons.nth(i).text_content() or ""
+                    if desired_option.lower() in current_text.lower():
+                        print(f"Already selected: '{desired_option}'")
+                        return
+                except:
+                    continue
+            print(f"⚠️ Skipping: Dropdown button with label containing '{label_text}' not found")
+            return
+
+        print(f"Selecting '{desired_option}' from '{label_text}'")
+        await target.click()
+        await page.wait_for_timeout(1000)
+
+        await retry(
+            lambda: page.locator('div[data-radix-popper-content-wrapper]').wait_for(timeout=5000),
+            "wait for radix dropdown to appear"
+        )
+
+        await retry(
+            lambda: page.locator('div[role="option"][data-radix-collection-item]', has_text=desired_option).first.wait_for(timeout=8000),
+            f"wait for option '{desired_option}' to appear"
+        )
+        option = page.locator('div[role="option"][data-radix-collection-item]', has_text=desired_option).first
+        await retry(lambda: option.scroll_into_view_if_needed(), f"scroll '{desired_option}' into view")
+        await retry(lambda: option.click(), f"click option '{desired_option}'")
+        await page.wait_for_timeout(1000)
+
+        confirmed = await target.text_content() or ""
         if desired_option.lower() not in confirmed.lower():
-            raise Exception(f"Post-check failed: '{desired_option}' not selected in '{label_text}' → got '{confirmed}'")
+            print(f"⚠️ Warning: Confirmed selection is '{confirmed}', expected '{desired_option}'")
+
     except Exception as e:
         print(f"Error: Dropdown failed [{label_text} → {desired_option}]: {e}")
-        raise
 
 async def scrape_mandiprices(return_results=False):
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(headless=False)
         page = await browser.new_page()
 
         try:
             await retry(lambda: page.goto("https://www.mandiprices.in/", timeout=60000), "navigate to site")
             await page.wait_for_timeout(3000)
 
-            await select_if_needed(page, "All Commodities", "Potato")
-            await select_if_needed(page, "All States", "All States")
-            await select_if_needed(page, "Price in", "Price in Quintal")
-            await select_if_needed(page, "Paginated", "Scroll")
+            await select_by_label(page, "All Commodities", "Potato")
+            await select_by_label(page, "All States", "All States")
+            await select_by_label(page, "Price in Kg", "Price in Quintal")
+            await select_by_label(page, "Paginated", "Scroll")
 
             await retry(lambda: page.wait_for_selector("table tbody tr", timeout=15000), "wait for table")
             await page.wait_for_timeout(3000)
@@ -131,13 +166,17 @@ async def scrape_mandiprices(return_results=False):
             }
 
         final = []
-        for state in states:
+        for state in sorted(states):
             final.append(normalized.get(state, {
                 "State": state,
                 "Minimum_Price": 0,
                 "Maximum_Price": 0,
                 "Current_Price": 0
             }))
+
+        with open("result_mandiprices_in.json", "w") as f:
+            json.dump(final, f, indent=2)
+        print("✅ Saved data to result_mandiprices_in.json")
 
         return final
 
