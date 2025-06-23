@@ -1,4 +1,4 @@
-import asyncio, json, re
+import asyncio, json, re, random
 from statistics import mean
 from collections import defaultdict
 from playwright.async_api import async_playwright
@@ -9,6 +9,11 @@ nest_asyncio.apply()
 def parse_price(text):
     match = re.search(r"[\d,.]+", text)
     return float(match.group(0).replace(",", "")) if match else None
+
+async def wait_random(label=None):
+    delay = random.randint(5, 8)
+    print(f"⏳ Waiting {delay}s" + (f" after {label}" if label else ""))
+    await asyncio.sleep(delay)
 
 async def retry(action, label="", attempts=2, wait=1000):
     for i in range(attempts):
@@ -21,7 +26,7 @@ async def retry(action, label="", attempts=2, wait=1000):
 
 async def select_by_label(page, label_text, desired_option):
     try:
-        await page.wait_for_timeout(1000)
+        await wait_random(f"preparing to select '{label_text}'")
         buttons = page.locator('button[role="combobox"]')
         count = await buttons.count()
         target = None
@@ -54,7 +59,7 @@ async def select_by_label(page, label_text, desired_option):
 
         print(f"Selecting '{desired_option}' from '{label_text}'")
         await target.click()
-        await page.wait_for_timeout(1000)
+        await wait_random(f"after opening dropdown '{label_text}'")
 
         await retry(
             lambda: page.locator('div[data-radix-popper-content-wrapper]').wait_for(timeout=5000),
@@ -68,7 +73,8 @@ async def select_by_label(page, label_text, desired_option):
         option = page.locator('div[role="option"][data-radix-collection-item]', has_text=desired_option).first
         await retry(lambda: option.scroll_into_view_if_needed(), f"scroll '{desired_option}' into view")
         await retry(lambda: option.click(), f"click option '{desired_option}'")
-        await page.wait_for_timeout(1000)
+
+        await wait_random(f"after selecting '{desired_option}'")
 
         confirmed = await target.text_content() or ""
         if desired_option.lower() not in confirmed.lower():
@@ -79,20 +85,21 @@ async def select_by_label(page, label_text, desired_option):
 
 async def scrape_mandiprices(return_results=False):
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(headless=true)
         page = await browser.new_page()
 
         try:
             await retry(lambda: page.goto("https://www.mandiprices.in/", timeout=60000), "navigate to site")
-            await page.wait_for_timeout(3000)
+            await wait_random("page load")
 
             await select_by_label(page, "All Commodities", "Potato")
             await select_by_label(page, "All States", "All States")
             await select_by_label(page, "Price in Kg", "Price in Quintal")
             await select_by_label(page, "Paginated", "Scroll")
 
+            await wait_random("before waiting for table rows")
             await retry(lambda: page.wait_for_selector("table tbody tr", timeout=15000), "wait for table")
-            await page.wait_for_timeout(3000)
+            await wait_random("after table appears")
 
             rows = await page.query_selector_all("table tbody tr")
             print(f"Found {len(rows)} table rows")
