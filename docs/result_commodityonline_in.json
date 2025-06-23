@@ -36,9 +36,9 @@
     "State": "delhi"
   },
   {
-    "Current_Price": 1346.79,
-    "Minimum_Price": 250.0,
-    "Maximum_Price": 2200.0,
+    "Current_Price": null,
+    "Minimum_Price": null,
+    "Maximum_Price": null,
     "State": "gujarat"
   },
   {
