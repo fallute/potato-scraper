@@ -37,9 +37,10 @@ def run_mandiprices():
         print(f"❌ Error in MandiPrices scraper: {e}", flush=True)
 
 def calculate_average(values):
-    if not values:
-        return None
-    return round(sum(values) / len(values), 2)
+    valid = [v for v in values if v > 0]
+    if not valid:
+        return 0
+    return round(sum(valid) / len(valid), 2)
 
 def compute_per_state_averages(*sources):
     merged = defaultdict(list)
@@ -53,7 +54,7 @@ def compute_per_state_averages(*sources):
     for state, entries in merged.items():
         avg_entry = {"State": state}
         for key in ["Current_Price", "Minimum_Price", "Maximum_Price"]:
-            values = [e[key] for e in entries if e.get(key) is not None]
+            values = [e[key] for e in entries if isinstance(e.get(key), (int, float))]
             avg_entry[key] = calculate_average(values)
         output.append(avg_entry)
 
