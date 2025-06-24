@@ -156,15 +156,15 @@
     "State": "uttar-pradesh"
   },
   {
-    "Current_Price": null,
-    "Minimum_Price": null,
-    "Maximum_Price": null,
+    "Current_Price": 930.0,
+    "Minimum_Price": 500.0,
+    "Maximum_Price": 1500.0,
     "State": "uttrakhand"
   },
   {
-    "Current_Price": null,
-    "Minimum_Price": null,
-    "Maximum_Price": null,
+    "Current_Price": 1342.21,
+    "Minimum_Price": 1000.0,
+    "Maximum_Price": 2200.0,
     "State": "west-bengal"
   }
 ]

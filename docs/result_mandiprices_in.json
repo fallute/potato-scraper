@@ -67,9 +67,9 @@
   },
   {
     "State": "kerala",
-    "Minimum_Price": 3145,
-    "Maximum_Price": 3648,
-    "Current_Price": 3383
+    "Minimum_Price": 3123,
+    "Maximum_Price": 3613,
+    "Current_Price": 3355
   },
   {
     "State": "madhya-pradesh",
@@ -163,8 +163,8 @@
   },
   {
     "State": "west-bengal",
-    "Minimum_Price": 1317,
-    "Maximum_Price": 1374,
-    "Current_Price": 1342
+    "Minimum_Price": 1316,
+    "Maximum_Price": 1373,
+    "Current_Price": 1341
   }
 ]
