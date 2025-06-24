@@ -66,7 +66,9 @@ async def scrape_all_states():
             try:
                 await page.goto("https://agmarknet.gov.in/", timeout=30000)
                 print("🌐 Page loaded.")
-                await page.screenshot(path="debug_github.png", full_page=True)
+                os.makedirs("debug", exist_ok=True)
+                await page.screenshot(path="debug/debug_github.png", full_page=True)
+
             except PlaywrightTimeoutError:
                 print("⚠️ Timeout during page load.")
 
