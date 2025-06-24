@@ -29,6 +29,13 @@ jobs:
       - name: Run All Scrapers
         run: python scrape_all.py
 
+      - name: Upload debug screenshot
+        uses: actions/upload-artifact@v4
+        with:
+        name: debug-github-screenshot
+        path: debug_github.png
+
+
       - name: Commit and Push
         run: |
           git config user.name "GitHub Actions"
