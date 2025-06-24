@@ -48,8 +48,11 @@ async def scrape_all_states():
     print("🌐 Opening Agmarknet...")
     async with async_playwright() as p:
         browser = await p.chromium.launch(
-            headless=True,
-            args=["--disable-blink-features=AutomationControlled"]
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--no-sandbox",
+                "--disable-dev-shm-usage"
+            ]
         )
         context = await browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/114.0.0.0 Safari/537.36",
@@ -63,7 +66,7 @@ async def scrape_all_states():
             try:
                 await page.goto("https://agmarknet.gov.in/", timeout=30000)
                 print("🌐 Page loaded.")
-                await page.screenshot(path="page_after_load.png", full_page=True)  # 🖼️ Debug screenshot
+                await page.screenshot(path="debug_github.png", full_page=True)
             except PlaywrightTimeoutError:
                 print("⚠️ Timeout during page load.")
 
