@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 # 🔄 Load district-state mapping from JSON file
 script_dir = os.path.dirname(__file__)
-with open("data/Indian-states-districts.json", "r", encoding="utf-8") as f:
+with open(os.path.join(script_dir, "data/Indian-states-districts.json"), "r", encoding="utf-8") as f:
     state_district_data = json.load(f)
 
 district_to_state = {}
@@ -45,20 +45,17 @@ async def scrape_all_states():
                 await page.goto("https://agmarknet.gov.in/", timeout=30000, wait_until="load")
                 print("🌐 Page loaded.")
             except PlaywrightTimeoutError:
-                print("⚠️ Timeout. Will still check dropdown...")
+                print("⚠️ Timeout during page load. Will still check for dropdown...")
 
             try:
-                dropdown = page.locator("#ddlArrivalPrice")
-                if await dropdown.count() > 0:
-                    print("✅ Dropdown found.")
-                    break
-                else:
-                    raise Exception("Dropdown not found")
+                await page.wait_for_selector("#ddlArrivalPrice", timeout=10000)
+                print("✅ Dropdown found.")
+                break
             except Exception as e:
-                print(f"❌ Attempt {attempt+1}/3 failed: {e}")
+                print(f"❌ Attempt {attempt+1}/3 failed: Dropdown not found - {e}")
                 if attempt == 2:
                     await browser.close()
-                    raise RuntimeError("❌ Page or dropdown failed after 3 attempts.")
+                    raise RuntimeError("❌ Page loaded but dropdown not found after 3 attempts.")
                 await asyncio.sleep(3)
 
         await asyncio.sleep(random.uniform(2, 3))
@@ -131,8 +128,7 @@ async def scrape_all_states():
         if row["Current_Price"] > 0:
             grouped[row["State"]]["current"].append(row["Current_Price"])
 
-    # 🎯 Final list of known states
-    given_states = [
+    desired_states = [
         "andhra-pradesh", "arunachal-pradesh", "assam", "bihar", "chattisgarh",
         "delhi", "gujarat", "haryana", "himachal-pradesh", "jharkhand",
         "karnataka", "kerala", "madhya-pradesh", "maharashtra", "manipur",
@@ -142,62 +138,47 @@ async def scrape_all_states():
     ]
 
     result = []
-    normalized_scraped_states = {
-        s.lower().replace(" ", "-"): s for s in grouped.keys()
-    }
+    state_map = {s.replace("-", " ").lower(): s for s in desired_states}
+    included_extra_states = []
 
-    matched_states = set()
-
-    # ✅ Include all given states
-    for given in given_states:
-        match = difflib.get_close_matches(given, normalized_scraped_states.keys(), n=1, cutoff=0.8)
+    for state_name, prices in grouped.items():
+        state_key = state_name.lower().replace("–", "-").replace("—", "-").replace("  ", " ").strip()
+        match = difflib.get_close_matches(state_key, state_map.keys(), n=1, cutoff=0.85)
         if match:
-            scraped_name = normalized_scraped_states[match[0]]
-            matched_states.add(scraped_name)
-            prices = grouped[scraped_name]
-            result.append({
-                "State": given,
-                "Minimum_Price": sum(prices["min"]) // len(prices["min"]) if prices["min"] else 0,
-                "Maximum_Price": sum(prices["max"]) // len(prices["max"]) if prices["max"] else 0,
-                "Current_Price": sum(prices["current"]) // len(prices["current"]) if prices["current"] else 0,
-            })
+            key = state_map[match[0]]
         else:
+            key = state_name.replace(" ", "-").lower()
+            included_extra_states.append(key)
+
+        result.append({
+            "State": key,
+            "Minimum_Price": sum(prices["min"]) // len(prices["min"]) if prices["min"] else 0,
+            "Maximum_Price": sum(prices["max"]) // len(prices["max"]) if prices["max"] else 0,
+            "Current_Price": sum(prices["current"]) // len(prices["current"]) if prices["current"] else 0
+        })
+
+    existing_keys = {entry["State"] for entry in result}
+    for s in desired_states:
+        if s not in existing_keys:
             result.append({
-                "State": given,
+                "State": s,
                 "Minimum_Price": 0,
                 "Maximum_Price": 0,
                 "Current_Price": 0
             })
 
-    # ✅ Add extra unmatched states
-    for state in grouped:
-        if state not in matched_states:
-            prices = grouped[state]
-            result.append({
-                "State": state.replace(" ", "-").lower(),
-                "Minimum_Price": sum(prices["min"]) // len(prices["min"]) if prices["min"] else 0,
-                "Maximum_Price": sum(prices["max"]) // len(prices["max"]) if prices["max"] else 0,
-                "Current_Price": sum(prices["current"]) // len(prices["current"]) if prices["current"] else 0,
-            })
+    result.sort(key=lambda x: x["State"])
+    print("✅ Scraping complete.")
 
-    # 🔍 Print extra states that were not in the given list
-    print("\n🆕 Extra states included (not in your list):")
-    extra_states = []
-    for state in grouped:
-        normalized = state.lower().replace(" ", "-")
-        match = difflib.get_close_matches(normalized, given_states, n=1, cutoff=0.8)
-        if not match:
-           extra_states.append(normalized)
-
-    if extra_states:
-       for s in sorted(extra_states):
-        print("•", s)
-    else:
-         print("✅ No extra states found.")
+    if included_extra_states:
+        print("⚠️ Extra states included that were not in desired list:", included_extra_states)
 
     await asyncio.sleep(2)
-    print("✅ Done.")
     return result
 
+# If running directly (test)
 if __name__ == "__main__":
-    asyncio.run(scrape_entire_table())
+    output = asyncio.run(scrape_all_states())
+    with open("result_agmarknet_gov_in.json", "w", encoding="utf-8") as f:
+        json.dump(output, f, indent=2, ensure_ascii=False)
+    print("💾 Saved result_agmarknet_gov_in.json")
