@@ -32,8 +32,8 @@ jobs:
       - name: Upload debug screenshot
         uses: actions/upload-artifact@v4
         with:
-        name: debug-github-screenshot
-        path: debug_github.png
+          name: debug-github-screenshot
+          path: debug/debug_github.png
 
 
       - name: Commit and Push
