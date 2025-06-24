@@ -24,8 +24,8 @@
     "State": "bihar"
   },
   {
-    "Current_Price": 1700.0,
-    "Minimum_Price": 1300.0,
+    "Current_Price": 1800.0,
+    "Minimum_Price": 1800.0,
     "Maximum_Price": 2000.0,
     "State": "chattisgarh"
   },
@@ -36,21 +36,21 @@
     "State": "delhi"
   },
   {
-    "Current_Price": 1108.33,
+    "Current_Price": 1360.94,
     "Minimum_Price": 200.0,
-    "Maximum_Price": 2250.0,
+    "Maximum_Price": 2600.0,
     "State": "gujarat"
   },
   {
-    "Current_Price": 1181.25,
+    "Current_Price": 1261.79,
     "Minimum_Price": 500.0,
-    "Maximum_Price": 1800.0,
+    "Maximum_Price": 3500.0,
     "State": "haryana"
   },
   {
-    "Current_Price": 1491.67,
+    "Current_Price": 1587.5,
     "Minimum_Price": 1000.0,
-    "Maximum_Price": 2200.0,
+    "Maximum_Price": 2500.0,
     "State": "himachal-pradesh"
   },
   {
