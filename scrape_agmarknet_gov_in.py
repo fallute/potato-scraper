@@ -7,7 +7,17 @@ from collections import defaultdict
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 from bs4 import BeautifulSoup
 
-# 🔄 Load district-state mapping from JSON file
+# 🎯 Required state list
+states_required = [
+    "andhra-pradesh", "arunachal-pradesh", "assam", "bihar", "chattisgarh",
+    "delhi", "gujarat", "haryana", "himachal-pradesh", "jharkhand",
+    "karnataka", "kerala", "madhya-pradesh", "maharashtra", "manipur",
+    "meghalaya", "mizoram", "nagaland", "odisha", "punjab",
+    "rajasthan", "sikkim", "tamil-nadu", "telangana", "tripura",
+    "uttar-pradesh", "uttrakhand", "west-bengal"
+]
+
+# 📂 Load district-to-state mapping
 script_dir = os.path.dirname(__file__)
 with open(os.path.join(script_dir, "data/Indian-states-districts.json"), "r", encoding="utf-8") as f:
     state_district_data = json.load(f)
@@ -33,30 +43,36 @@ def get_state_from_district(district_name):
         return district_to_state[match[0]]
     return "Unknown"
 
+# 🚀 Main scraper function
 async def scrape_all_states():
     print("🌐 Opening Agmarknet...")
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
 
+        # 🔁 Retry page + dropdown load up to 3 times
         for attempt in range(3):
             print(f"🧭 Navigating to Agmarknet (Attempt {attempt+1}/3)...")
             try:
-                await page.goto("https://agmarknet.gov.in/", timeout=30000, wait_until="load")
+                await page.goto("https://agmarknet.gov.in/", timeout=30000)
                 print("🌐 Page loaded.")
             except PlaywrightTimeoutError:
-                print("⚠️ Timeout during page load. Will still check for dropdown...")
+                print("⚠️ Timeout during page load.")
 
             try:
-                await page.wait_for_selector("#ddlArrivalPrice", timeout=10000)
-                print("✅ Dropdown found.")
-                break
+                dropdown = page.locator("#ddlArrivalPrice")
+                count = await dropdown.count()
+                if count > 0:
+                    print("✅ Dropdown found.")
+                    break
+                else:
+                    raise Exception("Dropdown not found")
             except Exception as e:
-                print(f"❌ Attempt {attempt+1}/3 failed: Dropdown not found - {e}")
+                print(f"❌ Attempt {attempt+1}/3 failed: {e}")
                 if attempt == 2:
                     await browser.close()
                     raise RuntimeError("❌ Page loaded but dropdown not found after 3 attempts.")
-                await asyncio.sleep(3)
+                await asyncio.sleep(2)
 
         await asyncio.sleep(random.uniform(2, 3))
         if await page.input_value("#ddlArrivalPrice") != "0":
@@ -69,6 +85,7 @@ async def scrape_all_states():
         await asyncio.sleep(random.uniform(2, 3))
         await page.click("#btnGo")
 
+        # 🔁 Retry table loading
         for attempt in range(3):
             try:
                 await page.wait_for_selector("#cphBody_GridPriceData", timeout=20000)
@@ -86,7 +103,7 @@ async def scrape_all_states():
         html = await page.inner_html("#cphBody_GridPriceData")
         await browser.close()
 
-    print("🧪 Parsing table...")
+    # 🧪 Parse table
     soup = BeautifulSoup(html, "html.parser")
     headers = [th.text.strip() for th in soup.select("tr th")]
     data = []
@@ -99,7 +116,6 @@ async def scrape_all_states():
             state = get_state_from_district(district)
             if state == "Unknown":
                 continue
-
             try:
                 min_price = int(row_data.get("Min Price (Rs./Quintal)", "0"))
                 max_price = int(row_data.get("Max Price (Rs./Quintal)", "0"))
@@ -108,7 +124,7 @@ async def scrape_all_states():
                 continue
 
             data.append({
-                "State": state,
+                "State": state.replace(" ", "-").lower(),
                 "Minimum_Price": min_price,
                 "Maximum_Price": max_price,
                 "Current_Price": modal_price
@@ -117,9 +133,8 @@ async def scrape_all_states():
     if not data:
         raise RuntimeError("❌ No valid price data found.")
 
-    print("📊 Grouping and averaging by state (excluding zeros)...")
+    # 📊 Group and average by state
     grouped = defaultdict(lambda: {"min": [], "max": [], "current": []})
-
     for row in data:
         if row["Minimum_Price"] > 0:
             grouped[row["State"]]["min"].append(row["Minimum_Price"])
@@ -128,57 +143,57 @@ async def scrape_all_states():
         if row["Current_Price"] > 0:
             grouped[row["State"]]["current"].append(row["Current_Price"])
 
-    desired_states = [
-        "andhra-pradesh", "arunachal-pradesh", "assam", "bihar", "chattisgarh",
-        "delhi", "gujarat", "haryana", "himachal-pradesh", "jharkhand",
-        "karnataka", "kerala", "madhya-pradesh", "maharashtra", "manipur",
-        "meghalaya", "mizoram", "nagaland", "odisha", "punjab",
-        "rajasthan", "sikkim", "tamil-nadu", "telangana", "tripura",
-        "uttar-pradesh", "uttrakhand", "west-bengal"
-    ]
+    result = {}
+    for state, prices in grouped.items():
+        if prices["min"] and prices["max"] and prices["current"]:
+            result[state] = {
+                "Minimum_Price": sum(prices["min"]) // len(prices["min"]),
+                "Maximum_Price": sum(prices["max"]) // len(prices["max"]),
+                "Current_Price": sum(prices["current"]) // len(prices["current"]),
+            }
 
-    result = []
-    state_map = {s.replace("-", " ").lower(): s for s in desired_states}
-    included_extra_states = []
+    # 🎯 Match to required states
+    final_result = []
+    extra_states = []
 
-    for state_name, prices in grouped.items():
-        state_key = state_name.lower().replace("–", "-").replace("—", "-").replace("  ", " ").strip()
-        match = difflib.get_close_matches(state_key, state_map.keys(), n=1, cutoff=0.85)
+    result_keys = list(result.keys())
+    for state in states_required:
+        match = difflib.get_close_matches(state, result_keys, n=1, cutoff=0.8)
         if match:
-            key = state_map[match[0]]
+            matched = match[0]
+            final_result.append({
+                "State": state,
+                "Minimum_Price": result[matched]["Minimum_Price"],
+                "Maximum_Price": result[matched]["Maximum_Price"],
+                "Current_Price": result[matched]["Current_Price"],
+            })
         else:
-            key = state_name.replace(" ", "-").lower()
-            included_extra_states.append(key)
-
-        result.append({
-            "State": key,
-            "Minimum_Price": sum(prices["min"]) // len(prices["min"]) if prices["min"] else 0,
-            "Maximum_Price": sum(prices["max"]) // len(prices["max"]) if prices["max"] else 0,
-            "Current_Price": sum(prices["current"]) // len(prices["current"]) if prices["current"] else 0
-        })
-
-    existing_keys = {entry["State"] for entry in result}
-    for s in desired_states:
-        if s not in existing_keys:
-            result.append({
-                "State": s,
+            final_result.append({
+                "State": state,
                 "Minimum_Price": 0,
                 "Maximum_Price": 0,
-                "Current_Price": 0
+                "Current_Price": 0,
             })
 
-    result.sort(key=lambda x: x["State"])
-    print("✅ Scraping complete.")
+    for scraped in result_keys:
+        match = difflib.get_close_matches(scraped, states_required, n=1, cutoff=0.8)
+        if not match:
+            final_result.append({
+                "State": scraped,
+                "Minimum_Price": result[scraped]["Minimum_Price"],
+                "Maximum_Price": result[scraped]["Maximum_Price"],
+                "Current_Price": result[scraped]["Current_Price"],
+            })
+            extra_states.append(scraped)
 
-    if included_extra_states:
-        print("⚠️ Extra states included that were not in desired list:", included_extra_states)
+    if extra_states:
+        print("🆕 Extra states detected (not in required list):")
+        for s in sorted(extra_states):
+            print("  -", s)
 
+    final_result.sort(key=lambda x: x["State"])
     await asyncio.sleep(2)
-    return result
+    return final_result
 
-# If running directly (test)
 if __name__ == "__main__":
-    output = asyncio.run(scrape_all_states())
-    with open("result_agmarknet_gov_in.json", "w", encoding="utf-8") as f:
-        json.dump(output, f, indent=2, ensure_ascii=False)
-    print("💾 Saved result_agmarknet_gov_in.json")
+    asyncio.run(scrape_all_states())
