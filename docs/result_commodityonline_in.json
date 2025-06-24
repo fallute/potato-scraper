@@ -12,9 +12,9 @@
     "State": "arunachal-pradesh"
   },
   {
-    "Current_Price": null,
-    "Minimum_Price": null,
-    "Maximum_Price": null,
+    "Current_Price": 1150.0,
+    "Minimum_Price": 1000.0,
+    "Maximum_Price": 1200.0,
     "State": "assam"
   },
   {
@@ -138,9 +138,9 @@
     "State": "tamil-nadu"
   },
   {
-    "Current_Price": null,
-    "Minimum_Price": null,
-    "Maximum_Price": null,
+    "Current_Price": 2425.0,
+    "Minimum_Price": 1200.0,
+    "Maximum_Price": 3400.0,
     "State": "telangana"
   },
   {
@@ -156,15 +156,15 @@
     "State": "uttar-pradesh"
   },
   {
-    "Current_Price": 930.0,
-    "Minimum_Price": 500.0,
-    "Maximum_Price": 1500.0,
+    "Current_Price": null,
+    "Minimum_Price": null,
+    "Maximum_Price": null,
     "State": "uttrakhand"
   },
   {
-    "Current_Price": 1342.21,
-    "Minimum_Price": 1000.0,
-    "Maximum_Price": 2200.0,
+    "Current_Price": null,
+    "Minimum_Price": null,
+    "Maximum_Price": null,
     "State": "west-bengal"
   }
 ]

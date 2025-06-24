@@ -110,7 +110,7 @@
   {
     "State": "odisha",
     "Current_Price": 1922.22,
-    "Minimum_Price": null,
+    "Minimum_Price": 1738.89,
     "Maximum_Price": 2042.22
   },
   {
@@ -122,7 +122,7 @@
   {
     "State": "rajasthan",
     "Current_Price": 1275.0,
-    "Minimum_Price": 1091.67,
+    "Minimum_Price": null,
     "Maximum_Price": 1420.83
   },
   {
@@ -152,7 +152,7 @@
   {
     "State": "uttar-pradesh",
     "Current_Price": 1174.89,
-    "Minimum_Price": 1105.07,
+    "Minimum_Price": null,
     "Maximum_Price": 1245.58
   },
   {
