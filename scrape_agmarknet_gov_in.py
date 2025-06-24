@@ -47,8 +47,15 @@ def get_state_from_district(district_name):
 async def scrape_all_states():
     print("🌐 Opening Agmarknet...")
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
+        browser = await p.chromium.launch(
+            headless=True,
+            args=["--disable-blink-features=AutomationControlled"]
+        )
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/114.0.0.0 Safari/537.36",
+            viewport={"width": 1280, "height": 800}
+        )
+        page = await context.new_page()
 
         # 🔁 Retry page + dropdown load up to 3 times
         for attempt in range(3):
@@ -56,17 +63,20 @@ async def scrape_all_states():
             try:
                 await page.goto("https://agmarknet.gov.in/", timeout=30000)
                 print("🌐 Page loaded.")
+                await page.screenshot(path="page_after_load.png", full_page=True)  # 🖼️ Debug screenshot
             except PlaywrightTimeoutError:
                 print("⚠️ Timeout during page load.")
 
             try:
-                await page.wait_for_timeout(10000)  # ⏳ simulate wait up to 10s
-                dropdown = page.locator("#ddlArrivalPrice")
-                if await dropdown.count() > 0:
-                    print("✅ Dropdown found after wait.")
-                    break
+                for _ in range(10):
+                    dropdown = page.locator("#ddlArrivalPrice")
+                    if await dropdown.count() > 0:
+                        print("✅ Dropdown found.")
+                        break
+                    await asyncio.sleep(1)
                 else:
-                    raise Exception("Dropdown not found.")
+                    raise Exception("Dropdown not found after 10 seconds.")
+                break
             except Exception as e:
                 print(f"❌ Attempt {attempt+1}/3 failed: {e}")
                 if attempt == 2:
