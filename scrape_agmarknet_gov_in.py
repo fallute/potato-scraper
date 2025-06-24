@@ -59,6 +59,11 @@ async def scrape_all_states():
             viewport={"width": 1280, "height": 800}
         )
         page = await context.new_page()
+        await page.set_extra_http_headers({
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.google.com/",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        })
 
         # 🔁 Retry page + dropdown load up to 3 times
         for attempt in range(3):
