@@ -44,8 +44,8 @@
   {
     "State": "haryana",
     "Minimum_Price": 1388,
-    "Maximum_Price": 1613,
-    "Current_Price": 1382
+    "Maximum_Price": 1600,
+    "Current_Price": 1375
   },
   {
     "State": "himachal-pradesh",
@@ -67,9 +67,9 @@
   },
   {
     "State": "kerala",
-    "Minimum_Price": 3161,
-    "Maximum_Price": 3646,
-    "Current_Price": 3396
+    "Minimum_Price": 3145,
+    "Maximum_Price": 3648,
+    "Current_Price": 3383
   },
   {
     "State": "madhya-pradesh",
