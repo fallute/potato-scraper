@@ -24,9 +24,9 @@
     "State": "bihar"
   },
   {
-    "Current_Price": null,
-    "Minimum_Price": null,
-    "Maximum_Price": null,
+    "Current_Price": 1800.0,
+    "Minimum_Price": 1800.0,
+    "Maximum_Price": 2000.0,
     "State": "chattisgarh"
   },
   {

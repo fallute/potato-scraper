@@ -2,7 +2,7 @@
   {
     "State": "andhra-pradesh",
     "Current_Price": 1500.0,
-    "Minimum_Price": 1000.0,
+    "Minimum_Price": null,
     "Maximum_Price": 2000.0
   },
   {
@@ -21,7 +21,7 @@
     "State": "bihar",
     "Current_Price": 1475.0,
     "Minimum_Price": 1350.0,
-    "Maximum_Price": 1600.0
+    "Maximum_Price": null
   },
   {
     "State": "chattisgarh",
@@ -39,12 +39,12 @@
     "State": "gujarat",
     "Current_Price": 1383.33,
     "Minimum_Price": 1055.56,
-    "Maximum_Price": 1672.22
+    "Maximum_Price": null
   },
   {
     "State": "haryana",
     "Current_Price": 1212.63,
-    "Minimum_Price": 1092.89,
+    "Minimum_Price": null,
     "Maximum_Price": 1462.89
   },
   {
@@ -62,7 +62,7 @@
   {
     "State": "karnataka",
     "Current_Price": 2232.0,
-    "Minimum_Price": 2007.0,
+    "Minimum_Price": null,
     "Maximum_Price": 2557.0
   },
   {
@@ -74,7 +74,7 @@
   {
     "State": "madhya-pradesh",
     "Current_Price": 1283.21,
-    "Minimum_Price": null,
+    "Minimum_Price": 1079.57,
     "Maximum_Price": 1466.79
   },
   {
@@ -86,7 +86,7 @@
   {
     "State": "manipur",
     "Current_Price": 3050.0,
-    "Minimum_Price": null,
+    "Minimum_Price": 2800.0,
     "Maximum_Price": 3300.0
   },
   {
@@ -104,13 +104,13 @@
   {
     "State": "nagaland",
     "Current_Price": 4100.0,
-    "Minimum_Price": 4000.0,
+    "Minimum_Price": null,
     "Maximum_Price": 4200.0
   },
   {
     "State": "odisha",
     "Current_Price": 1922.22,
-    "Minimum_Price": 1738.89,
+    "Minimum_Price": null,
     "Maximum_Price": 2042.22
   },
   {
@@ -122,7 +122,7 @@
   {
     "State": "rajasthan",
     "Current_Price": 1275.0,
-    "Minimum_Price": null,
+    "Minimum_Price": 1091.67,
     "Maximum_Price": 1420.83
   },
   {
@@ -140,7 +140,7 @@
   {
     "State": "telangana",
     "Current_Price": 2425.0,
-    "Minimum_Price": 2225.0,
+    "Minimum_Price": null,
     "Maximum_Price": 2600.0
   },
   {
@@ -158,7 +158,7 @@
   {
     "State": "uttrakhand",
     "Current_Price": 930.0,
-    "Minimum_Price": 762.5,
+    "Minimum_Price": null,
     "Maximum_Price": 1101.67
   },
   {
