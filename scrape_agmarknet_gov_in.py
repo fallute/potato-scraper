@@ -60,13 +60,13 @@ async def scrape_all_states():
                 print("⚠️ Timeout during page load.")
 
             try:
+                await page.wait_for_timeout(10000)  # ⏳ simulate wait up to 10s
                 dropdown = page.locator("#ddlArrivalPrice")
-                count = await dropdown.count()
-                if count > 0:
-                    print("✅ Dropdown found.")
+                if await dropdown.count() > 0:
+                    print("✅ Dropdown found after wait.")
                     break
                 else:
-                    raise Exception("Dropdown not found")
+                    raise Exception("Dropdown not found.")
             except Exception as e:
                 print(f"❌ Attempt {attempt+1}/3 failed: {e}")
                 if attempt == 2:
