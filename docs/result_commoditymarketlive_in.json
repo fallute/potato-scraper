@@ -14,7 +14,7 @@
   {
     "State": "assam",
     "Current_Price": 1150.0,
-    "Minimum_Price": null,
+    "Minimum_Price": 1000.0,
     "Maximum_Price": 1150.0
   },
   {
@@ -38,7 +38,7 @@
   {
     "State": "gujarat",
     "Current_Price": 1394.44,
-    "Minimum_Price": null,
+    "Minimum_Price": 1066.67,
     "Maximum_Price": 1686.11
   },
   {
@@ -80,7 +80,7 @@
   {
     "State": "maharashtra",
     "Current_Price": 1672.73,
-    "Minimum_Price": 1336.36,
+    "Minimum_Price": null,
     "Maximum_Price": 1988.64
   },
   {
@@ -92,7 +92,7 @@
   {
     "State": "meghalaya",
     "Current_Price": 2433.33,
-    "Minimum_Price": null,
+    "Minimum_Price": 2166.67,
     "Maximum_Price": 2700.0
   },
   {
@@ -104,8 +104,8 @@
   {
     "State": "nagaland",
     "Current_Price": 4100.0,
-    "Minimum_Price": null,
-    "Maximum_Price": 4200.0
+    "Minimum_Price": 4000.0,
+    "Maximum_Price": null
   },
   {
     "State": "odisha",
@@ -116,7 +116,7 @@
   {
     "State": "punjab",
     "Current_Price": 989.15,
-    "Minimum_Price": 864.76,
+    "Minimum_Price": null,
     "Maximum_Price": 1126.22
   },
   {
@@ -158,13 +158,13 @@
   {
     "State": "uttrakhand",
     "Current_Price": 930.0,
-    "Minimum_Price": null,
+    "Minimum_Price": 762.5,
     "Maximum_Price": 1101.67
   },
   {
     "State": "west-bengal",
     "Current_Price": 1347.9,
-    "Minimum_Price": 1315.9,
+    "Minimum_Price": null,
     "Maximum_Price": 1380.0
   }
 ]
