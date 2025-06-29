@@ -1,3 +1,12 @@
+import sys
+import io
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+
+# Optional: override default open to use utf-8 globally
+import builtins
+open = lambda *args, **kwargs: builtins.open(*args, encoding='utf-8', **kwargs)
+
 import asyncio
 import json
 import os
@@ -19,31 +28,31 @@ results = {
 
 def run_commoditymarketlive():
     try:
-        print("🚀 Starting CommodityMarketLive scraper", flush=True)
+        print("Starting CommodityMarketLive scraper", flush=True)
         results["commoditymarketlive"] = asyncio.run(scrape_all_states_commoditymarketlive())
     except Exception as e:
-        print(f"❌ Error in CommodityMarketLive scraper: {e}", flush=True)
+        print(f"Error in CommodityMarketLive scraper: {e}", flush=True)
 
 def run_commodityonline():
     try:
-        print("🚀 Starting CommodityOnline scraper", flush=True)
+        print("Starting CommodityOnline scraper", flush=True)
         results["commodityonline"] = asyncio.run(scrape_all_states_commodityonline())
     except Exception as e:
-        print(f"❌ Error in CommodityOnline scraper: {e}", flush=True)
+        print(f"Error in CommodityOnline scraper: {e}", flush=True)
 
 def run_mandiprices():
     try:
-        print("🚀 Starting MandiPrices scraper", flush=True)
+        print("Starting MandiPrices scraper", flush=True)
         results["mandiprices"] = asyncio.run(scrape_mandiprices(return_results=True))
     except Exception as e:
-        print(f"❌ Error in MandiPrices scraper: {e}", flush=True)
+        print(f"Error in MandiPrices scraper: {e}", flush=True)
 
 def run_agmarknet():
     try:
-        print("🚀 Starting Agmarknet scraper", flush=True)
+        print("Starting Agmarknet scraper", flush=True)
         results["agmarknet"] = asyncio.run(scrape_all_states_agmarknet())
     except Exception as e:
-        print(f"❌ Error in Agmarknet scraper: {e}", flush=True)
+        print(f"Error in Agmarknet scraper: {e}", flush=True)
 
 def calculate_average(values):
     valid = [v for v in values if isinstance(v, (int, float)) and v > 0]
@@ -70,7 +79,7 @@ def compute_per_state_averages(*sources):
     return sorted(output, key=lambda x: x["State"])
 
 def main():
-    print("🔁 Launching all scrapers...", flush=True)
+    print("Launching all scrapers...", flush=True)
 
     t1 = threading.Thread(target=run_commoditymarketlive)
     t2 = threading.Thread(target=run_commodityonline)
@@ -87,41 +96,68 @@ def main():
     t3.join()
     t4.join()
 
-    print("💾 Saving JSON to /docs", flush=True)
+    print("Saving JSON to /docs", flush=True)
     os.makedirs("docs", exist_ok=True)
 
+    def save_with_date(filename, new_data):
+        today = datetime.date.today()
+        today_str = today.isoformat()
+        path = os.path.join("docs", filename)
+
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    existing = json.load(f)
+            except Exception:
+                existing = {}
+        else:
+            existing = {}
+
+        if not isinstance(existing, dict):
+            existing = {}
+
+        # Keep only valid ISO date keys within last 30 days
+        cleaned = {}
+        for k, v in existing.items():
+            try:
+                dt = datetime.date.fromisoformat(k)
+                if (today - dt).days <= 30:
+                    cleaned[k] = v
+            except ValueError:
+                continue  # skip invalid date
+
+        cleaned[today_str] = new_data
+
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(cleaned, f, indent=2)
+
     if results["commoditymarketlive"]:
-        with open("docs/result_commoditymarketlive_in.json", "w") as f:
-            json.dump(results["commoditymarketlive"], f, indent=2)
+        save_with_date("result_commoditymarketlive_in.json", results["commoditymarketlive"])
 
     if results["commodityonline"]:
-        with open("docs/result_commodityonline_in.json", "w") as f:
-            json.dump(results["commodityonline"], f, indent=2)
+        save_with_date("result_commodityonline_in.json", results["commodityonline"])
 
     if results["mandiprices"]:
-        with open("docs/result_mandiprices_in.json", "w") as f:
-            json.dump(results["mandiprices"], f, indent=2)
+        save_with_date("result_mandiprices_in.json", results["mandiprices"])
 
     if results["agmarknet"]:
-        with open("docs/result_agmarknet_gov_in.json", "w") as f:
-            json.dump(results["agmarknet"], f, indent=2)
+        save_with_date("result_agmarknet_gov_in.json", results["agmarknet"])
 
-    # ✅ Combine all for per-state average
+    # Combine all for per-state average
     per_state_avg = compute_per_state_averages(
         results["commoditymarketlive"],
         results["commodityonline"],
         results["mandiprices"],
         results["agmarknet"]
     )
-    with open("docs/combined_averages.json", "w") as f:
-        json.dump(per_state_avg, f, indent=2)
+    save_with_date("combined_averages.json", per_state_avg)
 
-    # ✅ Save run timestamp
+    # Save run timestamp
     timestamp_data = {"last_run": datetime.datetime.utcnow().isoformat() + "Z"}
     with open("docs/run_timestamp.json", "w") as f:
         json.dump(timestamp_data, f, indent=2)
 
-    # ✅ Save failure report
+    # Save failure report
     failed = {}
     for key in results:
         if results[key] is None:
@@ -130,7 +166,7 @@ def main():
     with open("docs/status_report.json", "w") as f:
         json.dump(failed if failed else None, f, indent=2)
 
-    print("✅ All done!", flush=True)
+    print("All done!", flush=True)
 
 if __name__ == "__main__":
     main()
