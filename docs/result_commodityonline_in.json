@@ -30,9 +30,9 @@
     "State": "chattisgarh"
   },
   {
-    "Current_Price": null,
-    "Minimum_Price": null,
-    "Maximum_Price": null,
+    "Current_Price": 1610.0,
+    "Minimum_Price": 400.0,
+    "Maximum_Price": 2400.0,
     "State": "delhi"
   },
   {
@@ -84,9 +84,9 @@
     "State": "maharashtra"
   },
   {
-    "Current_Price": null,
-    "Minimum_Price": null,
-    "Maximum_Price": null,
+    "Current_Price": 3050.0,
+    "Minimum_Price": 2500.0,
+    "Maximum_Price": 3500.0,
     "State": "manipur"
   },
   {

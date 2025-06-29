@@ -31,9 +31,9 @@
   },
   {
     "State": "delhi",
-    "Current_Price": null,
-    "Minimum_Price": null,
-    "Maximum_Price": null
+    "Current_Price": 1610.0,
+    "Minimum_Price": 1000.0,
+    "Maximum_Price": 2200.0
   },
   {
     "State": "gujarat",
@@ -80,7 +80,7 @@
   {
     "State": "maharashtra",
     "Current_Price": 1648.21,
-    "Minimum_Price": 1357.14,
+    "Minimum_Price": null,
     "Maximum_Price": 3017.86
   },
   {
@@ -116,7 +116,7 @@
   {
     "State": "punjab",
     "Current_Price": 1086.67,
-    "Minimum_Price": 941.67,
+    "Minimum_Price": null,
     "Maximum_Price": 1207.08
   },
   {
@@ -164,7 +164,7 @@
   {
     "State": "west-bengal",
     "Current_Price": 1502.14,
-    "Minimum_Price": 1460.0,
+    "Minimum_Price": null,
     "Maximum_Price": 1544.29
   }
 ]
