@@ -5,7 +5,7 @@ sys.stderr.reconfigure(encoding='utf-8')
 
 # Optional: override default open to use utf-8 globally
 import builtins
-open = lambda *args, **kwargs: builtins.open(*args, encoding='utf-8', **kwargs)
+open = lambda *args, **kwargs: builtins.open(*args, **{'encoding': 'utf-8'} | kwargs)
 
 import asyncio
 import json
@@ -153,7 +153,7 @@ def main():
     save_with_date("combined_averages.json", per_state_avg)
 
     # Save run timestamp
-    timestamp_data = {"last_run": datetime.datetime.utcnow().isoformat() + "Z"}
+    timestamp_data = {"last_run": datetime.datetime.now(datetime.timezone.utc).isoformat()}
     with open("docs/run_timestamp.json", "w") as f:
         json.dump(timestamp_data, f, indent=2)
 

@@ -1,3 +1,7 @@
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+
 import asyncio
 import json
 import os
@@ -7,7 +11,6 @@ from collections import defaultdict
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 from bs4 import BeautifulSoup
 
-# 🎯 Required state list
 states_required = [
     "andhra-pradesh", "arunachal-pradesh", "assam", "bihar", "chattisgarh",
     "delhi", "gujarat", "haryana", "himachal-pradesh", "jharkhand",
@@ -17,7 +20,6 @@ states_required = [
     "uttar-pradesh", "uttrakhand", "west-bengal"
 ]
 
-# 📂 Load district-to-state mapping
 script_dir = os.path.dirname(__file__)
 with open(os.path.join(script_dir, "data/Indian-states-districts.json"), "r", encoding="utf-8") as f:
     state_district_data = json.load(f)
@@ -36,16 +38,20 @@ def get_state_from_district(district_name):
     if not district_name:
         return "Unknown"
     name = district_name.strip().lower()
+
+    # ✅ First try exact match
     if name in district_to_state:
         return district_to_state[name]
-    match = difflib.get_close_matches(name, known_districts, n=1, cutoff=0.8)
+
+    # 🔍 Then try fuzzy match if exact match fails
+    match = difflib.get_close_matches(name, known_districts, n=1, cutoff=0.7)
     if match:
         return district_to_state[match[0]]
+
     return "Unknown"
 
-# 🚀 Main scraper function
 async def scrape_all_states():
-    print("🌐 Opening Agmarknet...")
+    print("Opening Agmarknet...")
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             args=[
@@ -65,33 +71,31 @@ async def scrape_all_states():
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
         })
 
-        # 🔁 Retry page + dropdown load up to 3 times
         for attempt in range(3):
-            print(f"🧭 Navigating to Agmarknet (Attempt {attempt+1}/3)...")
+            print(f"Navigating to Agmarknet (Attempt {attempt+1}/3)...")
             try:
                 await page.goto("https://agmarknet.gov.in/", timeout=30000)
-                print("🌐 Page loaded.")
+                print("Page loaded.")
                 os.makedirs("debug", exist_ok=True)
                 await page.screenshot(path="debug/debug_github.png", full_page=True)
-
             except PlaywrightTimeoutError:
-                print("⚠️ Timeout during page load.")
+                print("Timeout during page load.")
 
             try:
                 for _ in range(10):
                     dropdown = page.locator("#ddlArrivalPrice")
                     if await dropdown.count() > 0:
-                        print("✅ Dropdown found.")
+                        print("Dropdown found.")
                         break
                     await asyncio.sleep(1)
                 else:
                     raise Exception("Dropdown not found after 10 seconds.")
                 break
             except Exception as e:
-                print(f"❌ Attempt {attempt+1}/3 failed: {e}")
+                print(f"Attempt {attempt+1}/3 failed: {e}")
                 if attempt == 2:
                     await browser.close()
-                    raise RuntimeError("❌ Page loaded but dropdown not found after 3 attempts.")
+                    raise RuntimeError("Page loaded but dropdown not found after 3 attempts.")
                 await asyncio.sleep(2)
 
         await asyncio.sleep(random.uniform(2, 3))
@@ -105,25 +109,23 @@ async def scrape_all_states():
         await asyncio.sleep(random.uniform(2, 3))
         await page.click("#btnGo")
 
-        # 🔁 Retry table loading
         for attempt in range(3):
             try:
                 await page.wait_for_selector("#cphBody_GridPriceData", timeout=20000)
                 await asyncio.sleep(4)
                 break
             except PlaywrightTimeoutError:
-                print(f"⚠️ Table wait failed (Attempt {attempt+1}/3)")
+                print(f"Table wait failed (Attempt {attempt+1}/3)")
                 if attempt < 2:
                     await page.click("#btnGo")
                     await asyncio.sleep(2)
                 else:
                     await browser.close()
-                    raise RuntimeError("❌ Table did not load after 3 tries.")
+                    raise RuntimeError("Table did not load after 3 tries.")
 
         html = await page.inner_html("#cphBody_GridPriceData")
         await browser.close()
 
-    # 🧪 Parse table
     soup = BeautifulSoup(html, "html.parser")
     headers = [th.text.strip() for th in soup.select("tr th")]
     data = []
@@ -151,9 +153,8 @@ async def scrape_all_states():
             })
 
     if not data:
-        raise RuntimeError("❌ No valid price data found.")
+        raise RuntimeError("No valid price data found.")
 
-    # 📊 Group and average by state
     grouped = defaultdict(lambda: {"min": [], "max": [], "current": []})
     for row in data:
         if row["Minimum_Price"] > 0:
@@ -172,7 +173,6 @@ async def scrape_all_states():
                 "Current_Price": sum(prices["current"]) // len(prices["current"]),
             }
 
-    # 🎯 Match to required states
     final_result = []
     extra_states = []
 
@@ -207,7 +207,7 @@ async def scrape_all_states():
             extra_states.append(scraped)
 
     if extra_states:
-        print("🆕 Extra states detected (not in required list):")
+        print("Extra states detected (not in required list):")
         for s in sorted(extra_states):
             print("  -", s)
 

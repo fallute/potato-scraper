@@ -1,3 +1,10 @@
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+
+
+# ... your existing imports and logic ...
+
 import asyncio, re, random
 from statistics import mean
 from collections import defaultdict
@@ -12,7 +19,7 @@ def parse_price(text):
 
 async def wait_random(label=None):
     delay = random.randint(5, 8)
-    print(f"⏳ Waiting {delay}s" + (f" after {label}" if label else ""))
+    print(f"Waiting {delay}s" + (f" after {label}" if label else ""))
     await asyncio.sleep(delay)
 
 async def retry(action, label="", attempts=2, wait=1000):
@@ -55,17 +62,17 @@ async def select_by_label(page, label_text, desired_option):
                         return
                 except:
                     continue
-            print(f"⚠️ Skipping: Dropdown button with label containing '{label_text}' not found")
+            print(f"Skipping: Dropdown button with label containing '{label_text}' not found")
             return
 
         print(f"Selecting '{desired_option}' from '{label_text}'")
         await target.click()
 
         if label_text.lower() == "all commodities":
-            print("✅ 'All Commodities' dropdown opened, waiting 11s before selecting 'Potato'")
+            print("'All Commodities' dropdown opened, waiting 11s before selecting 'Potato'")
             await asyncio.sleep(11)
         elif label_text.lower() == "paginated":
-            print("✅ 'Paginated' dropdown opened, waiting 11s before selecting 'Scroll'")
+            print("'Paginated' dropdown opened, waiting 11s before selecting 'Scroll'")
             await asyncio.sleep(11)
         else:
             await retry(
@@ -73,7 +80,7 @@ async def select_by_label(page, label_text, desired_option):
                 f"wait for dropdown '{label_text}' content to appear"
             )
             delay = random.randint(5, 8)
-            print(f"✅ '{label_text}' visible, waiting extra {delay}s before selecting '{desired_option}'...")
+            print(f"'{label_text}' visible, waiting extra {delay}s before selecting '{desired_option}'...")
             await asyncio.sleep(delay)
 
         await retry(
@@ -88,11 +95,11 @@ async def select_by_label(page, label_text, desired_option):
 
         confirmed = await target.text_content() or ""
         if desired_option.lower() not in confirmed.lower():
-            print(f"⚠️ Warning: Confirmed selection is '{confirmed}', expected '{desired_option}'")
+            print(f"Warning: Confirmed selection is '{confirmed}', expected '{desired_option}'")
 
-        # ⬇️ Re-check Potato if we just selected Scroll
+        # Re-check Potato if we just selected Scroll
         if label_text.lower() == "paginated":
-            print("🔁 Re-checking 'All Commodities' → 'Potato' after Scroll selection")
+            print("Re-checking 'All Commodities' → 'Potato' after Scroll selection")
             await select_by_label(page, "All Commodities", "Potato")
 
     except Exception as e:
@@ -196,7 +203,7 @@ async def scrape_mandiprices(return_results=False):
                 "Current_Price": 0
             }))
 
-        print("✅ Scraping complete. Final results prepared.")
+        print("Scraping complete. Final results prepared.")
         return final if return_results else None
 
 if __name__ == "__main__":
