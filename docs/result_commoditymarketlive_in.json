@@ -27,7 +27,7 @@
     {
       "State": "chattisgarh",
       "Current_Price": 2200.0,
-      "Minimum_Price": null,
+      "Minimum_Price": 2150.0,
       "Maximum_Price": 2350.0
     },
     {
@@ -87,13 +87,13 @@
     {
       "State": "manipur",
       "Current_Price": 3050.0,
-      "Minimum_Price": null,
+      "Minimum_Price": 2800.0,
       "Maximum_Price": 3300.0
     },
     {
       "State": "meghalaya",
       "Current_Price": 1550.0,
-      "Minimum_Price": 1500.0,
+      "Minimum_Price": null,
       "Maximum_Price": 1600.0
     },
     {

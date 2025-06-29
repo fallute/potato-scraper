@@ -43,9 +43,9 @@
       "State": "gujarat"
     },
     {
-      "Current_Price": 1155.64,
-      "Minimum_Price": 700.0,
-      "Maximum_Price": 3000.0,
+      "Current_Price": null,
+      "Minimum_Price": null,
+      "Maximum_Price": null,
       "State": "haryana"
     },
     {
