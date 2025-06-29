@@ -1,3 +1,10 @@
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+
+
+# ... your existing imports and logic ...
+
 import asyncio
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
@@ -64,11 +71,13 @@ async def scrape_all_states(progress_callback=None):
         for state in states:
             if progress_callback:
                 progress_callback(state)
-            print(f"🔄 Scraping Online site → {state}", flush=True)
+            print(f"Scraping Online site : {state}", flush=True)
 
             html = None
             try:
-                url = f"https://www.commodityonline.com/mandiprices/potato/{state}"
+                url_state = "nct-of-delhi" if state == "delhi" else state
+                url = f"https://www.commodityonline.com/mandiprices/potato/{url_state}"
+
                 await page.goto(url, timeout=10000)
                 await page.wait_for_selector("div.mandi_highlight", timeout=10000)
                 html = await page.inner_html("div.mandi_highlight")
@@ -80,7 +89,8 @@ async def scrape_all_states(progress_callback=None):
             avg = prices['Current_Price']
             min_ = prices['Minimum_Price']
             max_ = prices['Maximum_Price']
-            print(f"   ↳ ₹{avg} / ₹{min_} / ₹{max_}", flush=True)
+            # Modified line below
+            print(f"   {avg or 0} / {min_ or 0} / {max_ or 0}", flush=True)
             all_prices.append(prices)
 
         await browser.close()

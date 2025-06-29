@@ -1,3 +1,7 @@
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+
 import asyncio
 from playwright.async_api import async_playwright
 import re
@@ -15,7 +19,8 @@ states = [
 ]
 
 async def scrape_state_price(page, state):
-    url = f"https://www.commoditymarketlive.com/mandi-price-state/{state}/potato"
+    url_state = "nct-of-delhi" if state == "delhi" else state
+    url = f"https://www.commoditymarketlive.com/mandi-price-state/{url_state}/potato"
     try:
         await page.goto(url, timeout=20000)
         await page.wait_for_selector("table.pricesummarytable", timeout=10000)
@@ -54,9 +59,14 @@ async def scrape_all_states(progress_callback=None):
         for state in states:
             if progress_callback:
                 progress_callback(state)
-            print(f"🔄 Scraping Live site → {state}", flush=True)
+            print(f"Scraping Live site : {state}", flush=True)
             result = await scrape_state_price(page, state)
-            print(f"   ↳ ₹{result['Current_Price']} / ₹{result['Minimum_Price']} / ₹{result['Maximum_Price']}", flush=True)
+            # Modified line below (changed ₹ to numeric-only)
+            print(f"   {result['Current_Price'] or 0} / {result['Minimum_Price'] or 0} / {result['Maximum_Price'] or 0}", flush=True)
             results.append(result)
         await browser.close()
     return results
+
+# To run the script
+if __name__ == "__main__":
+    asyncio.run(scrape_all_states())
