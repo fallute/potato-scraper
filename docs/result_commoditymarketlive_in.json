@@ -15,7 +15,7 @@
     {
       "State": "assam",
       "Current_Price": 1150.0,
-      "Minimum_Price": null,
+      "Minimum_Price": 1000.0,
       "Maximum_Price": 1150.0
     },
     {
@@ -45,7 +45,7 @@
     {
       "State": "haryana",
       "Current_Price": 1154.47,
-      "Minimum_Price": null,
+      "Minimum_Price": 1014.74,
       "Maximum_Price": 1336.84
     },
     {
@@ -159,7 +159,7 @@
     {
       "State": "uttrakhand",
       "Current_Price": 1250.0,
-      "Minimum_Price": 900.0,
+      "Minimum_Price": null,
       "Maximum_Price": 1600.0
     },
     {
