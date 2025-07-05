@@ -21,7 +21,7 @@ jobs:
 
     - name: Run Agmarknet Scraper with Free Proxy
       run: |
-        python3 scrape_agmarknet_gov_in.py
+        python3 -u scrape_agmarknet_gov_in.py
 
     - name: Upload debug artifacts
       if: always()

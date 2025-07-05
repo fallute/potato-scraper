@@ -61,7 +61,7 @@ def get_state_from_district(district_name):
     return "Unknown"
 
 async def scrape_all_states():
-    print("Opening Agmarknet with free proxy rotation...")
+    print("Opening Agmarknet with proxy + early dropdown check...")
 
     for attempt in range(5):
         proxy = get_random_proxy()
@@ -81,11 +81,13 @@ async def scrape_all_states():
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
                 })
 
-                await page.goto("https://agmarknet.gov.in/", timeout=30000)
-                print("✅ Page loaded.")
+                print("⏳ Loading page (max wait 15s)...")
+                task = asyncio.create_task(page.goto("https://agmarknet.gov.in/", timeout=15000))
+                
                 os.makedirs("debug", exist_ok=True)
                 await page.screenshot(path=f"debug/debug_attempt_{attempt+1}.png", full_page=True)
 
+                print("🔍 Checking for dropdown...")
                 for _ in range(10):
                     dropdown = page.locator("#ddlArrivalPrice")
                     if await dropdown.count() > 0:
@@ -93,8 +95,13 @@ async def scrape_all_states():
                         break
                     await asyncio.sleep(1)
                 else:
-                    raise Exception("Dropdown not found after 10 seconds.")
+                    print("❌ Dropdown not found. Retrying...")
+                    await page.screenshot(path=f"debug/debug_attempt_{attempt+1}_nodropdown.png", full_page=True)
 
+                    await browser.close()
+                    continue  # try next proxy
+
+                print("⬇ Interacting with dropdowns...")
                 await asyncio.sleep(random.uniform(2, 3))
                 if await page.input_value("#ddlArrivalPrice") != "0":
                     await page.select_option("#ddlArrivalPrice", value="0")
@@ -117,17 +124,18 @@ async def scrape_all_states():
                             await page.click("#btnGo")
                             await asyncio.sleep(2)
                         else:
+                            await browser.close()
                             raise RuntimeError("Table did not load after 3 tries.")
 
                 html = await page.inner_html("#cphBody_GridPriceData")
                 await browser.close()
-                break  # success
+                break  # ✅ success
         except Exception as e:
-            print(f"❌ Failed with proxy {proxy}: {e}")
-            if attempt == 4:
-                raise RuntimeError("All proxy attempts failed.")
+            print(f"❌ Attempt {attempt+1} failed: {e}")
             await asyncio.sleep(5)
             continue
+    else:
+        raise RuntimeError("All proxy attempts failed.")
 
     soup = BeautifulSoup(html, "html.parser")
     headers = [th.text.strip() for th in soup.select("tr th")]
