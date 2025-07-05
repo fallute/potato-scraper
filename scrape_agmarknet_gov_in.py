@@ -12,11 +12,11 @@ from playwright.async_api import async_playwright, TimeoutError as PlaywrightTim
 from bs4 import BeautifulSoup
 
 states_required = [
-    "andhra-pradesh", "arunachal-pradesh", "assam", "bihar", "chattisgarh",
+    "andhra-pradesh", "assam", "bihar", "chandigarh", "chattisgarh",
     "delhi", "gujarat", "haryana", "himachal-pradesh", "jharkhand",
     "karnataka", "kerala", "madhya-pradesh", "maharashtra", "manipur",
     "meghalaya", "mizoram", "nagaland", "odisha", "punjab",
-    "rajasthan", "sikkim", "tamil-nadu", "telangana", "tripura",
+    "rajasthan", "tamil-nadu", "telangana", "tripura",
     "uttar-pradesh", "uttrakhand", "west-bengal"
 ]
 
@@ -39,11 +39,11 @@ def get_state_from_district(district_name):
         return "Unknown"
     name = district_name.strip().lower()
 
-    # ✅ First try exact match
+    # First try exact match
     if name in district_to_state:
         return district_to_state[name]
 
-    # 🔍 Then try fuzzy match if exact match fails
+    # Then try fuzzy match if exact match fails
     match = difflib.get_close_matches(name, known_districts, n=1, cutoff=0.7)
     if match:
         return district_to_state[match[0]]
@@ -216,4 +216,12 @@ async def scrape_all_states():
     return final_result
 
 if __name__ == "__main__":
+    import time
+    start = time.time()
+
     asyncio.run(scrape_all_states())
+
+    duration = time.time() - start
+    print(f"\n Finished scraping {len(results)} states.")
+    print(f" Total execution time: {duration:.2f} seconds")
+
