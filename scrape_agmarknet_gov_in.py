@@ -20,8 +20,21 @@ states_required = [
     "uttar-pradesh", "uttrakhand", "west-bengal"
 ]
 
+from stem import Signal
+from stem.control import Controller
+
+def rotate_tor_identity():
+    try:
+        with Controller.from_port(port=9051) as controller:
+            controller.authenticate()  # Uses default cookie
+            controller.signal(Signal.NEWNYM)
+            print("🔁 New Tor identity requested.")
+    except Exception as e:
+        print(f"⚠️ Tor identity rotation failed: {e}")
+
+
 import requests
-print("🔎 Checking Tor IP...")
+
 try:
     ip = requests.get("http://check.torproject.org/api/ip", proxies={
         'http': 'socks5h://127.0.0.1:9050',
@@ -30,6 +43,7 @@ try:
     print(f"✅ Tor IP: {ip['IP']} | IsTor: {ip['IsTor']}")
 except Exception as e:
     print(f"❌ Tor check failed: {e}")
+
 
 
 script_dir = os.path.dirname(__file__)
@@ -92,6 +106,8 @@ async def scrape_all_states():
                 await page.screenshot(path="debug/debug_github.png", full_page=True)
             except PlaywrightTimeoutError:
                 print("Timeout during page load.")
+                rotate_tor_identity()
+                await asyncio.sleep(5)
 
             try:
                 for _ in range(10):
