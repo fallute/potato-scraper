@@ -11,20 +11,17 @@ from collections import defaultdict
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 from bs4 import BeautifulSoup
 
-# 🧩 List of free proxies (rotate randomly)
-FREE_PROXIES = [
-    "http://64.225.8.121:10021",
-    "http://157.245.1.59:3128",
-    "http://134.209.29.120:3128",
-    "http://38.156.233.239:999",
-    "http://45.91.133.137:8080",
-    "http://103.151.247.18:80",
-    "http://103.163.231.113:80",
-    "http://198.12.250.250:3128"
-]
+# sCRAPER ai 
+SCRAPERAPI_KEY = os.getenv("SCRAPERAPI_KEY") or "0d469222bca55ec241086ab0fcafbc86"  # replace or set via env
 
-def get_random_proxy():
-    return random.choice(FREE_PROXIES)
+SCRAPER_PROXY = {
+    "server": "http://proxy-server.scraperapi.com:8001",
+    "username": "scraperapi",
+    "password": SCRAPERAPI_KEY
+}
+
+print("🔐 ScraperAPI key length:", len(os.getenv("SCRAPERAPI_KEY") or "None"))
+
 
 states_required = [
     "andhra-pradesh", "assam", "bihar", "chandigarh", "chattisgarh",
@@ -64,12 +61,11 @@ async def scrape_all_states():
     print("Opening Agmarknet with proxy + early dropdown check...")
 
     for attempt in range(5):
-        proxy = get_random_proxy()
-        print(f"\n🌍 Attempt {attempt+1}/5 using proxy: {proxy}")
+        print(f"\n Attempt {attempt+1}/5 via ScraperAPI proxy")
 
-        try:
+       try:
             async with async_playwright() as p:
-                browser = await p.chromium.launch(proxy={"server": proxy})
+                browser = await p.chromium.launch(proxy=SCRAPER_PROXY)
                 context = await browser.new_context(
                     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/114.0.0.0 Safari/537.36",
                     viewport={"width": 1280, "height": 800}
