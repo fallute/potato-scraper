@@ -27,7 +27,7 @@ jobs:
       run: |
         pip install playwright==1.42.0
         playwright install chromium
-        pip install beautifulsoup4
+        pip install beautifulsoup4 stem "requests[socks]"
 
     - name: Run Agmarknet scraper ONLY
       run: |
