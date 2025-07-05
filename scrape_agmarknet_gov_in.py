@@ -20,6 +20,18 @@ states_required = [
     "uttar-pradesh", "uttrakhand", "west-bengal"
 ]
 
+import requests
+print("🔎 Checking Tor IP...")
+try:
+    ip = requests.get("http://check.torproject.org/api/ip", proxies={
+        'http': 'socks5h://127.0.0.1:9050',
+        'https': 'socks5h://127.0.0.1:9050'
+    }, timeout=10).json()
+    print(f"✅ Tor IP: {ip['IP']} | IsTor: {ip['IsTor']}")
+except Exception as e:
+    print(f"❌ Tor check failed: {e}")
+
+
 script_dir = os.path.dirname(__file__)
 with open(os.path.join(script_dir, "data/Indian-states-districts.json"), "r", encoding="utf-8") as f:
     state_district_data = json.load(f)
