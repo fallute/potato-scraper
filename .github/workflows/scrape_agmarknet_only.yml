@@ -1,4 +1,4 @@
-name: Scrape Agmarknet Only via Tor
+name: Scrape Agmarknet via Free Proxies
 
 on:
   workflow_dispatch:
@@ -13,27 +13,19 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
-    - name: Install Tor with ControlPort enabled
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y tor python3 python3-pip
-        sudo systemctl stop tor
-        echo "ControlPort 9051" | sudo tee -a /etc/tor/torrc
-        echo "CookieAuthentication 1" | sudo tee -a /etc/tor/torrc
-        sudo systemctl start tor
-        echo "Tor with ControlPort started"
-
-    - name: Export Tor proxy for Playwright
-      run: |
-        echo 'export http_proxy=socks5h://127.0.0.1:9050' >> $GITHUB_ENV
-        echo 'export https_proxy=socks5h://127.0.0.1:9050' >> $GITHUB_ENV
-
-    - name: Install Python dependencies
+    - name: Set up Python and Playwright
       run: |
         pip install playwright==1.42.0
         playwright install chromium
-        pip install beautifulsoup4 stem "requests[socks]"
+        pip install beautifulsoup4
 
-    - name: Run Agmarknet Scraper via Tor
+    - name: Run Agmarknet Scraper with Free Proxy
       run: |
         python3 scrape_agmarknet_gov_in.py
+
+    - name: Upload debug artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: agmarknet-debug
+        path: debug/
